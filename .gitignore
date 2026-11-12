@@ -1,5 +1,8 @@
 node_modules/
+# film deliverables are committed; only intermediates are ignored
 films/**/*.mp4
+!films/lost-sheep/lost-sheep-final.mp4
+!films/proof/proof-final.mp4
 films/**/*.wav
 films/lost-sheep/*.mp4
 films/lost-sheep/*.wav
