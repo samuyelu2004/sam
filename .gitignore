@@ -1,0 +1,3 @@
+node_modules/
+films/**/*.mp4
+films/**/*.wav

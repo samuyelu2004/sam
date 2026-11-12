@@ -1,0 +1,13 @@
+{
+  "name": "sam",
+  "private": true,
+  "type": "module",
+  "description": "Code-made films, following the Lemo-Opuscar style library.",
+  "scripts": {
+    "proof": "node films/proof/render.mjs"
+  },
+  "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.1",
+    "@napi-rs/canvas": "^0.1.80"
+  }
+}
