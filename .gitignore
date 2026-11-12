@@ -1,3 +1,6 @@
 node_modules/
 films/**/*.mp4
 films/**/*.wav
+films/lost-sheep/*.mp4
+films/lost-sheep/*.wav
+films/proof/proof-final.mp4

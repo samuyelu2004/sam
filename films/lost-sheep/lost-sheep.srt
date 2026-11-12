@@ -1,0 +1,11 @@
+1
+00:00:04,200 --> 00:00:06,400
+One is missing.
+
+2
+00:00:07,400 --> 00:00:09,900
+So he leaves the ninety-nine.
+
+3
+00:00:10,800 --> 00:00:12,500
+He searches until he finds it.
