@@ -1,0 +1,12 @@
+{
+  "name": "the-two-trees-hd2d",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.9.41 preview",
+    "play": "npx --yes hyperframes@0.9.41 play",
+    "lint": "npx --yes hyperframes@0.9.41 lint",
+    "check": "npx --yes hyperframes@0.9.41 check",
+    "render": "npx --yes hyperframes@0.9.41 render --output renders/the-two-trees-hd2d.mp4"
+  }
+}

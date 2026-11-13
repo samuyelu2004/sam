@@ -1,0 +1,246 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #09080c;
+      font-family: 'EB Garamond', serif;
+    }
+    .stage-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .cam-plane {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      will-change: transform;
+    }
+    .scene-art {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: cover;
+      image-rendering: auto;
+    }
+    .god-rays {
+      position: absolute;
+      inset: -120px;
+      background:
+        repeating-linear-gradient(
+          118deg,
+          transparent 0px,
+          transparent 110px,
+          rgba(186, 118, 210, 0.18) 155px,
+          transparent 220px
+        );
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .mote {
+      position: absolute;
+      background: #ff8856;
+      box-shadow: 0 0 12px 3px rgba(255, 98, 52, 0.88);
+      border-radius: 1px;
+      pointer-events: none;
+    }
+    .hd2d-tiltshift {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(6, 5, 10, 0.68) 0%, rgba(6, 5, 10, 0.0) 17%, rgba(6, 5, 10, 0.0) 76%, rgba(6, 5, 10, 0.78) 100%),
+        radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 54%, rgba(5, 4, 9, 0.76) 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .hd2d-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.018) 0px,
+        rgba(255, 255, 255, 0.018) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 6;
+    }
+    .hd2d-frame {
+      position: absolute;
+      left: 96px;
+      right: 96px;
+      top: 54px;
+      bottom: 54px;
+      border: 1px solid rgba(218, 182, 108, 0.28);
+      box-shadow: inset 0 0 0 3px rgba(10, 8, 14, 0.45);
+      pointer-events: none;
+      z-index: 7;
+    }
+    .chapter-plaque {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 22px;
+      background: linear-gradient(180deg, rgba(16, 14, 22, 0.88) 0%, rgba(10, 9, 15, 0.92) 100%);
+      border: 1px solid rgba(226, 189, 112, 0.62);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 0 0 2px rgba(226, 189, 112, 0.16);
+    }
+    .chapter-act {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #f3d287;
+    }
+    .chapter-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: #d6ceb8;
+    }
+    .hd2d-hero-card {
+      text-align: center;
+      padding: 26px 44px;
+      background: linear-gradient(180deg, rgba(14, 12, 20, 0.86) 0%, rgba(9, 8, 14, 0.92) 100%);
+      border: 1px solid rgba(232, 195, 116, 0.75);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.75), inset 0 0 0 3px rgba(232, 195, 116, 0.18);
+    }
+    .hero-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.28em;
+      color: #d9b86c;
+      margin-bottom: 10px;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #fff8e7;
+    }
+    .hero-rule {
+      width: 180px;
+      height: 2px;
+      margin: 14px auto;
+      background: linear-gradient(90deg, transparent, #e5c16c, transparent);
+    }
+    .hero-sub {
+      font-family: 'EB Garamond', serif;
+      font-size: 26px;
+      font-style: italic;
+      color: #efe4ca;
+    }
+  </style>
+
+  <div id="root" data-composition-id="scene-03" data-width="1920" data-height="1080">
+    <div id="s03-stage-clip" class="clip stage-wrap" data-start="0" data-duration="14.2">
+      <div id="s03-fade-wrap" class="stage-wrap">
+        <div id="s03-cam" class="cam-plane">
+          <img id="s03-img" class="clip scene-art" src="assets/images/scene-03-the-fall.png" data-start="0" data-duration="14.2" alt="ACT III · THE FRACTURED WORLD" />
+          <div id="s03-rays" class="god-rays"></div>
+        </div>
+        <div id="s03-mote-0" class="mote" style="left:210px; top:820px; width:6px; height:6px;"></div>
+        <div id="s03-mote-1" class="mote" style="left:340px; top:740px; width:8px; height:8px;"></div>
+        <div id="s03-mote-2" class="mote" style="left:490px; top:860px; width:5px; height:5px;"></div>
+        <div id="s03-mote-3" class="mote" style="left:640px; top:690px; width:7px; height:7px;"></div>
+        <div id="s03-mote-4" class="mote" style="left:780px; top:790px; width:9px; height:9px;"></div>
+        <div id="s03-mote-5" class="mote" style="left:930px; top:640px; width:6px; height:6px;"></div>
+        <div id="s03-mote-6" class="mote" style="left:1060px; top:830px; width:8px; height:8px;"></div>
+        <div id="s03-mote-7" class="mote" style="left:1210px; top:720px; width:5px; height:5px;"></div>
+        <div id="s03-mote-8" class="mote" style="left:1360px; top:810px; width:7px; height:7px;"></div>
+        <div id="s03-mote-9" class="mote" style="left:1510px; top:750px; width:8px; height:8px;"></div>
+        <div id="s03-mote-10" class="mote" style="left:1670px; top:850px; width:6px; height:6px;"></div>
+        <div id="s03-mote-11" class="mote" style="left:860px; top:440px; width:7px; height:7px;"></div>
+        <div id="s03-mote-12" class="mote" style="left:1120px; top:480px; width:6px; height:6px;"></div>
+        <div id="s03-mote-13" class="mote" style="left:560px; top:510px; width:8px; height:8px;"></div>
+        <div id="s03-tilt" class="hd2d-tiltshift"></div>
+        <div id="s03-scan" class="hd2d-scanlines"></div>
+        <div id="s03-border" class="hd2d-frame"></div>
+      </div>
+    </div>
+
+    <div id="s03-banner-clip" class="clip" data-start="0.35" data-duration="13.5" style="position:absolute; left:192px; top:96px; z-index:8;">
+      <div id="s03-banner" class="chapter-plaque">
+        <div class="chapter-act">ACT III · THE FRACTURED WORLD</div>
+        <div class="chapter-ref">GENESIS 3:6</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(
+      "#s03-fade-wrap",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.65, ease: "power2.out" },
+      0
+    );
+    tl.to(
+      "#s03-fade-wrap",
+      { opacity: 0, duration: 0.5, ease: "power2.in" },
+      13.65
+    );
+    tl.fromTo(
+      "#s03-cam",
+      { scale: 1.04, x: 16, y: -6 },
+      { scale: 1.13, x: -14, y: 12, duration: 14.2, ease: "sine.inOut" },
+      0
+    );
+    tl.fromTo(
+      "#s03-rays",
+      { x: -36, opacity: 0.55 },
+      { x: 42, opacity: 0.95, duration: 14.2, ease: "sine.inOut" },
+      0
+    );
+    tl.fromTo(
+      "#s03-banner",
+      { opacity: 0, x: -18 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" },
+      0.35
+    );
+    tl.to(
+      "#s03-banner",
+      { opacity: 0, x: -10, duration: 0.35, ease: "power2.in" },
+      13.45
+    );
+    tl.fromTo("#s03-mote-0", { x: 0, y: 0, opacity: 0.18 }, { x: 22, y: -95, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-0", { x: 35.2, y: -171.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-1", { x: 0, y: 0, opacity: 0.18 }, { x: -18, y: -110, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-1", { x: -28.8, y: -198.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-2", { x: 0, y: 0, opacity: 0.18 }, { x: 15, y: -130, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-2", { x: 24.0, y: -234.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-3", { x: 0, y: 0, opacity: 0.18 }, { x: -24, y: -85, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-3", { x: -38.4, y: -153.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-4", { x: 0, y: 0, opacity: 0.18 }, { x: 20, y: -125, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-4", { x: 32.0, y: -225.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-5", { x: 0, y: 0, opacity: 0.18 }, { x: -14, y: -105, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-5", { x: -22.4, y: -189.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-6", { x: 0, y: 0, opacity: 0.18 }, { x: 26, y: -118, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-6", { x: 41.6, y: -212.4, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-7", { x: 0, y: 0, opacity: 0.18 }, { x: -20, y: -90, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-7", { x: -32.0, y: -162.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-8", { x: 0, y: 0, opacity: 0.18 }, { x: 18, y: -115, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-8", { x: 28.8, y: -207.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-9", { x: 0, y: 0, opacity: 0.18 }, { x: -16, y: -100, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-9", { x: -25.6, y: -180.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-10", { x: 0, y: 0, opacity: 0.18 }, { x: 14, y: -120, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-10", { x: 22.4, y: -216.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-11", { x: 0, y: 0, opacity: 0.18 }, { x: 22, y: -75, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-11", { x: 35.2, y: -135.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-12", { x: 0, y: 0, opacity: 0.18 }, { x: -18, y: -80, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-12", { x: -28.8, y: -144.0, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+    tl.fromTo("#s03-mote-13", { x: 0, y: 0, opacity: 0.18 }, { x: 16, y: -88, opacity: 0.92, duration: 7.1, ease: "sine.inOut" }, 0);
+    tl.to("#s03-mote-13", { x: 25.6, y: -158.4, opacity: 0.22, duration: 6.82, ease: "sine.inOut" }, 7.1);
+
+    window.__timelines["scene-03"] = tl;
+  </script>
+</template>
