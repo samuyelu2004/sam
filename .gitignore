@@ -5,4 +5,5 @@ films/**/*.mp4
 !films/lost-sheep/lost-sheep-final.mp4
 !films/proof/proof-final.mp4
 !films/eden/eden-final.mp4
+!films/never-heard/never-heard-final.mp4
 films/**/*.wav
