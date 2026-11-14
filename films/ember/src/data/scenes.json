@@ -1,0 +1,206 @@
+{
+  "meta": {
+    "title": "He Had Been Dead 4 Days",
+    "series": "DID YOU KNOW? BIBLE",
+    "tag": "TRUE STORY",
+    "network": "THE EMBER NETWORK",
+    "tagline": "Scripture, one story at a time.",
+    "fps": 30,
+    "width": 720,
+    "height": 1280,
+    "durationInSeconds": 65
+  },
+  "audio": {
+    "voiceover": null,
+    "music": "audio/music.mp3",
+    "musicVolume": 0.5,
+    "sfx": [
+      { "src": "audio/stone-slam.mp3", "at": 13.45, "volume": 0.9, "note": "scene 4 — the stone shuts on Lazarus" },
+      { "src": "audio/stone-slam.mp3", "at": 31.9, "volume": 0.8, "note": "scene 9 — the stone is dragged aside" },
+      { "src": "audio/boom.mp3", "at": 59.4, "volume": 1.0, "note": "scene 10 — silence, then the shout" }
+    ]
+  },
+  "scenes": [
+    {
+      "id": 1,
+      "from": 0,
+      "to": 3,
+      "title": "Hook",
+      "set": "hook",
+      "camera": { "zoomFrom": 1.06, "zoomTo": 1.2, "panX": [0, 0], "panY": [0, -10] },
+      "shake": [{ "at": 0.35, "amount": 16 }, { "at": 1.5, "amount": 7 }],
+      "captions": [
+        { "from": 0.3, "to": 3, "text": "HE HAD BEEN DEAD 4 DAYS.", "gold": ["4", "DAYS"], "size": "huge", "pos": "center", "top": 210 },
+        { "from": 0.85, "to": 3, "text": "THEN JESUS SHOUTED ONE WORD.", "gold": ["SHOUTED"], "size": "mid", "pos": "center", "top": 690 }
+      ]
+    },
+    {
+      "id": 2,
+      "from": 3,
+      "to": 10,
+      "title": "Lazarus is dying",
+      "set": "sickroom",
+      "camera": { "zoomFrom": 1.0, "zoomTo": 1.1, "panX": [-14, 10], "panY": [6, -10] },
+      "captions": [
+        { "from": 0.2, "to": 2.8, "text": "LAZARUS WAS DYING.", "gold": ["DYING"], "size": "big", "pos": "low" },
+        { "from": 2.9, "to": 5.3, "text": "HIS SISTERS SENT WORD:", "gold": ["SENT WORD"], "size": "big", "pos": "low" },
+        { "from": 5.6, "to": 7.6, "text": "JESUS LOVED HIM.", "gold": ["LOVED"], "size": "big", "pos": "low" },
+        { "from": 7.6, "to": 10, "text": "SO HE CAME RUNNING. RIGHT?", "gold": ["RIGHT"], "size": "big", "pos": "low" }
+      ],
+      "bubbles": [{ "from": 3.1, "to": 6.1, "text": "Your friend is sick.", "side": "right", "top": 470 }]
+    },
+    {
+      "id": 3,
+      "from": 10,
+      "to": 17,
+      "title": "He stayed two more days",
+      "set": "roadJesus",
+      "camera": { "zoomFrom": 1.02, "zoomTo": 1.12, "panX": [10, -6], "panY": [0, -8] },
+      "captions": [
+        { "from": 0.2, "to": 2, "text": "THE MESSENGER FOUND JESUS.", "gold": ["FOUND"], "size": "big", "pos": "low" },
+        { "from": 2, "to": 4.4, "text": "NO. JESUS STAYED TWO MORE DAYS.", "gold": ["TWO MORE DAYS"], "size": "big", "pos": "mid" },
+        { "from": 4.6, "to": 7, "text": "WHY WOULD HE WAIT?", "gold": ["WHY"], "size": "big", "pos": "mid" }
+      ],
+      "badges": [{ "from": 4.2, "to": 7, "label": "John 11:6" }]
+    },
+    {
+      "id": 4,
+      "from": 17,
+      "to": 24,
+      "title": "He dies, he is buried",
+      "set": "burial",
+      "camera": { "zoomFrom": 1.0, "zoomTo": 1.14, "panX": [0, -12], "panY": [0, -8] },
+      "shake": [{ "at": 4.1, "amount": 18 }, { "at": 4.6, "amount": 6 }],
+      "captions": [
+        { "from": 0.2, "to": 2.6, "text": "BY THE TIME JESUS CAME,", "gold": ["JESUS"], "size": "big", "pos": "low" },
+        { "from": 2.6, "to": 4.4, "text": "LAZARUS WAS DEAD.", "gold": ["DEAD"], "size": "big", "pos": "low" },
+        { "from": 4.7, "to": 7, "text": "FOUR DAYS IN THE TOMB.", "gold": ["FOUR"], "size": "big", "pos": "mid" }
+      ],
+      "badges": [{ "from": 4.5, "to": 7, "label": "Buried 4 days" }]
+    },
+    {
+      "id": 5,
+      "from": 24,
+      "to": 31,
+      "title": "Martha runs to him",
+      "set": "meet",
+      "camera": { "zoomFrom": 1.04, "zoomTo": 1.12, "panX": [-16, 6], "panY": [0, -6] },
+      "captions": [
+        { "from": 0.2, "to": 2.4, "text": "MARTHA RAN TO MEET HIM.", "gold": ["RAN"], "size": "big", "pos": "low" },
+        { "from": 5.6, "to": 7, "text": "HIS NEXT WORDS STUNNED HER.", "gold": ["STUNNED"], "size": "big", "pos": "low" }
+      ],
+      "quotes": [
+        {
+          "from": 2.6,
+          "to": 5.6,
+          "text": "Lord, if thou hadst been here, my brother had not died.",
+          "ref": "John 11:21 KJV"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "from": 31,
+      "to": 37,
+      "title": "I am the resurrection",
+      "set": "closeJesus",
+      "camera": { "zoomFrom": 1.0, "zoomTo": 1.08, "panX": [0, 0], "panY": [0, -12] },
+      "captions": [
+        { "from": 0.2, "to": 0.9, "text": "JESUS SAID:", "gold": ["SAID"], "size": "big", "pos": "low" },
+        { "from": 4.8, "to": 6, "text": "THEN HE ASKED FOR THE TOMB.", "gold": ["TOMB"], "size": "big", "pos": "low" }
+      ],
+      "quotes": [{ "from": 0.8, "to": 4.8, "text": "I am the resurrection, and the life.", "ref": "John 11:25 KJV", "top": 902, "size": 42 }]
+    },
+    {
+      "id": 7,
+      "from": 37,
+      "to": 43,
+      "title": "Jesus wept",
+      "set": "tombWeep",
+      "camera": { "zoomFrom": 1.02, "zoomTo": 1.12, "panX": [6, -8], "panY": [0, -10] },
+      "captions": [
+        { "from": 0.2, "to": 2, "text": "HE STOOD AT THE TOMB.", "gold": ["TOMB"], "size": "big", "pos": "low" },
+        { "from": 2, "to": 3.7, "text": "JESUS WEPT.", "gold": ["WEPT"], "size": "huge", "pos": "mid" },
+        { "from": 3.9, "to": 5.4, "text": "HE KNEW WHAT HE WOULD DO.", "gold": ["KNEW"], "size": "big", "pos": "low" },
+        { "from": 5.4, "to": 6.9, "text": "AND HE STILL CRIED.", "gold": ["CRIED"], "size": "big", "pos": "mid" }
+      ],
+      "badges": [{ "from": 2.1, "to": 3.8, "label": "John 11:35 KJV" }]
+    },
+    {
+      "id": 8,
+      "from": 43,
+      "to": 49,
+      "title": "It's too late",
+      "set": "tombHand",
+      "camera": { "zoomFrom": 1.06, "zoomTo": 1.14, "panX": [-8, 8], "panY": [0, -6] },
+      "captions": [
+        { "from": 0.2, "to": 1.7, "text": "THEN HE WALKED TO THE TOMB.", "gold": ["TOMB"], "size": "big", "pos": "low" },
+        { "from": 1.7, "to": 3.4, "text": "THE CROWD STEPPED BACK.", "gold": ["STEPPED BACK"], "size": "big", "pos": "low" },
+        { "from": 5.2, "to": 6, "text": "EVERYONE SAID: TOO LATE.", "gold": ["TOO LATE"], "size": "big", "pos": "low" }
+      ],
+      "quotes": [
+        {
+          "from": 3.2,
+          "to": 5.2,
+          "text": "Lord, by this time he stinketh: for he hath been dead four days.",
+          "ref": "John 11:39 KJV"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "from": 49,
+      "to": 55,
+      "title": "They open the tomb",
+      "set": "tombPull",
+      "camera": { "zoomFrom": 1.0, "zoomTo": 1.14, "panX": [0, -10], "panY": [0, -10] },
+      "shake": [{ "at": 1.3, "amount": 9 }],
+      "captions": [
+        { "from": 0.2, "to": 2.4, "text": "THEY ROLLED THE STONE AWAY.", "gold": ["ROLLED"], "size": "big", "pos": "low" },
+        { "from": 2.4, "to": 4.2, "text": "SMOKE. DUST. SILENCE.", "gold": ["SILENCE"], "size": "big", "pos": "mid" },
+        { "from": 4.3, "to": 6, "text": "AND JESUS SHOUTED...", "gold": ["SHOUTED"], "size": "big", "pos": "mid" }
+      ]
+    },
+    {
+      "id": 10,
+      "from": 55,
+      "to": 60,
+      "title": "Lazarus, come forth",
+      "set": "tombShout",
+      "camera": { "zoomFrom": 1.04, "zoomTo": 1.16, "panX": [0, 0], "panY": [0, -14] },
+      "shake": [{ "at": 4.4, "amount": 22 }, { "at": 4.9, "amount": 10 }],
+      "captions": [
+        { "from": 3.6, "to": 5, "text": "ONE WORD.", "gold": ["ONE"], "size": "huge", "pos": "mid" }
+      ],
+      "quotes": [{ "from": 0.3, "to": 3.5, "text": "Lazarus, come forth.", "ref": "John 11:43 KJV", "top": 812, "size": 50 }]
+    },
+    {
+      "id": 11,
+      "from": 60,
+      "to": 63,
+      "title": "He waited for this",
+      "set": "tombDoorway",
+      "camera": { "zoomFrom": 1.0, "zoomTo": 1.12, "panX": [-6, 4], "panY": [0, -12] },
+      "quotes": [{ "from": 0.1, "to": 1.3, "text": "Loose him, and let him go.", "ref": "John 11:44 KJV" }],
+      "captions": [
+        { "from": 1.3, "to": 2, "text": "HE WAITED", "gold": ["WAITED"], "size": "huge", "pos": "mid" },
+        { "from": 2, "to": 3, "text": "SO THEY WOULD SEE GOD'S GLORY.", "gold": ["GLORY"], "size": "big", "pos": "mid" }
+      ]
+    },
+    {
+      "id": 12,
+      "from": 63,
+      "to": 65,
+      "title": "End card",
+      "set": "endcard",
+      "camera": { "zoomFrom": 1.0, "zoomTo": 1.03, "panX": [0, 0], "panY": [0, 0] },
+      "commentBox": {
+        "from": 0.25,
+        "to": 2,
+        "prompt": "WHAT ARE YOU WAITING ON GOD FOR?",
+        "typed": "I am waiting on...",
+        "top": 830
+      }
+    }
+  ]
+}

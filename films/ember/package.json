@@ -1,0 +1,23 @@
+{
+  "name": "ember-john-11",
+  "version": "1.0.0",
+  "private": true,
+  "description": "\"He Had Been Dead 4 Days\" — a 65 second vertical short in Remotion, built entirely in code.",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render John11 out/he-had-been-dead-4-days.mp4",
+    "still": "remotion still John11 out/still.png"
+  },
+  "dependencies": {
+    "@fontsource/archivo-black": "5.3.0",
+    "@fontsource/cormorant-garamond": "5.3.0",
+    "@remotion/cli": "4.0.543",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.543"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

@@ -7,3 +7,9 @@ films/**/*.mp4
 !films/eden/eden-final.mp4
 !films/never-heard/never-heard-final.mp4
 films/**/*.wav
+
+# the Remotion project: source + fonts + mp3s are committed, the raw wavs and
+# render scratch are not
+films/ember/public/audio/*.wav
+films/ember/out/*.mp4
+!films/ember/out/he-had-been-dead-4-days.mp4
