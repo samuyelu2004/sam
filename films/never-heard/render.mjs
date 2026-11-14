@@ -222,122 +222,195 @@ function boxSprite(wm, hm, dm, cTop, cLeft, cRight, extra) {
 }
 
 // ---- people ----------------------------------------------------------
-function personSprite(cfg) {
+/**
+ * One small rig, painted per frame. The tunic is narrow enough that the arms
+ * hang clear of it and the legs show below the hem, so a swing and a stride
+ * are actually visible at this size. `mode` is the pose, `ph` (0..1) the phase
+ * through its cycle — advance it with distance walked and the feet never skate.
+ */
+function personSprite(cfg, mode = 'idle', ph = 0) {
   const {
     robe = '#c8b18a', robeSh = '#9c8763', skin = '#c99a6a', skinSh = '#a67a50',
     hair = '#3a2a1e', beard = false, hood = false, helmet = false, wings = false,
-    cloak = null, pose = 'stand', female = false,
+    cloak = null, female = false,
   } = cfg;
-  const W = 34, H = 58, cx = 17;
-  const kneel = pose === 'kneel';
+  const W = 46, H = 58, cx = 23;
+  const A = ph * Math.PI * 2;
+  const sw = Math.sin(A);                  // stride / arm swing, -1..1
+  const breath = Math.sin(A);
+  const kneel = mode === 'kneel', walk = mode === 'walk';
+  const shut = (c, k) => mix(c, '#000000', k);
+  const lit = (c, k) => mix(c, '#fff3d8', k);
+
+  // vertical life: walk rides up between footfalls, idles breathe
+  const lift = walk ? Math.round(Math.abs(Math.cos(A)))
+    : (kneel ? 0 : (breath > 0.55 ? 1 : 0));
+  const hT = (kneel ? 12 : 7) - lift;        // top row of the skull
+  const hem = kneel ? 44 : 40;
+  const shY = hT + 10;                       // shoulder row
+  const chin = hT + 7;
+
   return paintCanvas(W, H, put => {
     const R = (x0, y0, w, h, c) => { for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) put(x, y, c); };
-    const shut = (c, k) => mix(c, '#000000', k);
-    const lit = (c, k) => mix(c, '#fff3d8', k);
+    // a 2 px thick limb: stepped blocks along a direction, skin at the tip
+    const limb = (x0, y0, dx, dy, len, col, tip) => {
+      const m = Math.hypot(dx, dy) || 1, sx = dx / m, sy = dy / m;
+      for (let i = 0; i <= len; i++) {
+        const x = Math.round(x0 + sx * i), y = Math.round(y0 + sy * i);
+        const c = tip && i >= len - 1 ? tip : col;
+        put(x, y, c); put(x + 1, y, c);
+        if (i < len) { put(x, y + 1, shut(c, 0.18)); put(x + 1, y + 1, shut(c, 0.18)); }
+      }
+    };
 
-    // wings, behind everything
+    // --- wings, behind everything -------------------------------------
     if (wings) {
+      const flap = Math.round(Math.sin(A) * 2);
       for (let i = 0; i < 3; i++) {
-        const sp = 6 + i * 3;
-        for (let y = 10 + i * 5; y < 26 + i * 5; y++) {
-          const half = sp + Math.round((y - 10 - i * 5) * 0.7);
+        const sp = 6 + i * 3 + (i === 0 ? flap : Math.round(flap * 0.5));
+        const y0 = hT + 2 + i * 5 + (i === 0 ? flap : 0);
+        for (let y = y0; y < y0 + 15; y++) {
+          const half = sp + Math.round((y - y0) * 0.7);
           for (let x = cx - 5 - half; x < cx - 4; x++) put(x, y, i === 0 ? '#fbf4e2' : (i === 1 ? '#e9dfc7' : '#d3c6aa'));
           for (let x = cx + 5; x < cx + 5 + half; x++) put(x, y, i === 0 ? '#e6dac0' : (i === 1 ? '#d6c8ab' : '#c2b394'));
         }
-        for (let x = cx - 5 - sp - 6; x < cx - 5 - sp; x++) put(x, 10 + i * 5 + 2, '#b9a884');
-        for (let x = cx + 5 + sp; x < cx + 5 + sp + 7; x++) put(x, 10 + i * 5 + 2, '#ae9d7c');
+        for (let x = cx - 5 - sp - 6; x < cx - 5 - sp; x++) put(x, y0 + 2, '#b9a884');
+        for (let x = cx + 5 + sp; x < cx + 5 + sp + 7; x++) put(x, y0 + 2, '#ae9d7c');
       }
     }
-    // cloak: hangs off the right shoulder, its edge is broken into steps
+
+    // --- cloak: behind the arm, hanging off the right shoulder --------
     if (cloak) {
-      for (let y = 16; y < (kneel ? 50 : 54); y++) {
-        const half = 6 + Math.round(((y - 16) / 38) * 4);
-        for (let x = cx + 3; x <= cx + half + 2; x++) put(x, y, x > cx + half ? shut(cloak, 0.18) : cloak);
-        put(cx + half + 1 + (y % 3 === 0 ? 1 : 0), y, shut(cloak, 0.3));
+      const sway = walk ? Math.round(sw * 1.4) : Math.round(Math.sin(A) * 0.6);
+      for (let y = shY + 1; y < (kneel ? 45 : 52); y++) {
+        const half = 4 + Math.round(((y - shY - 1) / 34) * 5);
+        const sx = Math.round(sway * clamp((y - shY) / 22));
+        for (let x = cx + 4 + sx; x <= cx + half + 4 + sx; x++) put(x, y, x >= cx + half + 3 + sx ? shut(cloak, 0.22) : cloak);
+        put(cx + half + 4 + sx + (y % 3 === 0 ? 1 : 0), y, shut(cloak, 0.34));
       }
     }
 
-    const hem = kneel ? 47 : (female ? 48 : 42);
-    // legs (hidden by the robe when kneeling)
-    if (!kneel) {
-      R(cx - 4, hem, 3, 10, '#5c4630');
-      R(cx + 1, hem, 3, 10, '#493722');
-      R(cx - 5, 53, 4, 3, '#33241a'); R(cx + 1, 53, 4, 3, '#33241a');
-    } else {
-      // one knee forward, the other folded under
-      R(cx - 7, 44, 14, 4, shut(robeSh, 0.1));
-      R(cx - 8, 47, 16, 3, robeSh);
-      R(cx + 3, 42, 5, 3, shut(robeSh, 0.2));
-    }
+    // --- legs -----------------------------------------------------------
+    const legsBack = () => {
+      if (kneel) {
+        // the folded thigh, glimpsed past the hip on both sides
+        R(cx - 10, 44, 4, 8, shut(robeSh, 0.18));
+        R(cx + 8, 44, 4, 8, shut(robeSh, 0.28));
+      } else {
+        const step = Math.round(sw * 2);
+        const far = { x: cx + 1 - step, l: walk && step > 0 ? 2 : 0, c: '#4a3622', b: '#2b1e14' };
+        const bootY = 52 - far.l;
+        R(far.x, hem + 1, 4, Math.max(1, bootY - hem), far.c);
+        R(far.x, bootY, 4, 4, far.b);
+        R(far.x, bootY, 4, 1, mix(far.b, '#f3e2c0', 0.12));
+      }
+    };
+    const legsFront = () => {
+      if (kneel) {
+        // kneeling to camera: short thighs down to the knee, boots tucked under
+        R(cx - 7, hem, 6, 8, mix(robeSh, robe, 0.30));
+        R(cx + 1, hem, 6, 8, shut(robeSh, 0.06));
+        R(cx - 7, hem, 6, 1, lit(robe, 0.16));
+        for (let y = hem + 1; y < 51; y++) put(cx, y, shut(robeSh, 0.5));
+        R(cx - 8, 51, 7, 4, '#38271a');
+        R(cx + 1, 51, 7, 4, '#2b1e14');
+        R(cx - 8, 51, 7, 1, mix('#38271a', '#f3e2c0', 0.12));
+      } else {
+        const step = Math.round(sw * 2);
+        const near = { x: cx - 4 + step, l: walk && step < 0 ? 2 : 0, c: '#5f4a32', b: '#38271a' };
+        const bootY = 52 - near.l;
+        R(near.x, hem + 1, 4, Math.max(1, bootY - hem), near.c);
+        R(near.x, bootY, 4, 4, near.b);
+        R(near.x, bootY, 4, 1, mix(near.b, '#f3e2c0', 0.13));
+        put(near.x + 3, bootY + 1, shut(near.b, 0.3));
+      }
+    };
+    if (!cfg.noLegs) legsBack();
 
-    // body: row-by-row taper, lit on the left, shadowed on the right
-    const top = kneel ? 20 : 15;
-    for (let y = top; y < hem; y++) {
-      const k = (y - top) / Math.max(1, hem - top);
-      const half = Math.round(4.5 + k * 2.6);
-      for (let x = cx - half; x <= cx + half; x++) {
+    // --- tunic ---------------------------------------------------------
+    for (let y = shY; y <= hem; y++) {
+      const k = (y - shY) / Math.max(1, hem - shY);
+      const half = 4.0 + k * 1.5;
+      const tail = Math.max(0, (y - (hem - 5)) / 5);
+      const sx = Math.round(-sw * 1.8 * tail);                // the hem swings
+      const x0 = Math.round(cx - half) + sx, x1 = Math.round(cx + half) + sx;
+      for (let x = x0; x <= x1; x++) {
         let c = robe;
-        if (x === cx - half) c = lit(robe, 0.16);
-        else if (x >= cx + half - 1) c = robeSh;
-        else if (k > 0.55 && x > cx + Math.round(half * 0.3)) c = mix(robe, robeSh, 0.45);
+        if (x === x0) c = lit(robe, 0.18);
+        else if (x >= x1 - 1) c = robeSh;
+        else if (k > 0.5 && x > x0 + Math.round((x1 - x0) * 0.66)) c = mix(robe, robeSh, 0.38);
         put(x, y, c);
       }
     }
-    // sash
-    const sashY = top + (kneel ? 15 : 19);
-    for (let x = cx - 6; x <= cx + 6; x++) { put(x, sashY, '#e8d4a8'); put(x, sashY + 1, '#c2ab80'); }
-    for (let y = sashY + 2; y < sashY + 8; y++) put(cx + 2, y, '#c2ab80');
-    // shoulders
-    R(cx - 6, top - 2, 13, 3, lit(robe, 0.1));
-    // arms
-    if (pose === 'reach') {
-      for (let i = 0; i < 11; i++) R(cx + 5 + i, top - 2 - Math.round(i * 0.85), 2, 3, i > 7 ? skin : robe);
-      R(cx - 7, top + 1, 2, 13, robeSh);
-      R(cx - 7, top + 14, 2, 2, skin);
-    } else if (pose === 'pray' || pose === 'kneel') {
-      R(cx - 7, top + 1, 2, 11, robeSh);
-      R(cx + 6, top + 1, 2, 11, robe);
-      const hy = top + 9;
-      R(cx - 3, hy, 3, 3, skin); R(cx, hy, 3, 3, lit(skin, 0.1));
-      R(cx - 2, hy - 4, 2, 5, robeSh); R(cx + 1, hy - 4, 2, 5, robe);
-    } else if (pose === 'walk') {
-      R(cx - 7, top + 1, 2, 12, robeSh); R(cx - 8, top + 13, 2, 2, skin);
-      R(cx + 6, top + 2, 2, 10, robe); R(cx + 7, top + 12, 2, 2, skin);
-      R(cx - 4, hem, 3, 6, robeSh); R(cx + 2, hem - 1, 3, 7, shut(robeSh, 0.12));
+    if (!cfg.noLegs) legsFront();
+    // sash and the fold that falls from it
+    const sashY = shY + 9;
+    for (let x = cx - 5; x <= cx + 5; x++) { put(x, sashY, '#e8d4a8'); put(x, sashY + 1, '#c2ab80'); }
+    for (let y = sashY + 2; y < sashY + 9; y++) put(cx + 1 + (walk ? Math.round(sw * 0.8) : 0), y, '#c2ab80');
+    // shoulders, a touch proud of the tunic
+    R(cx - 5, shY - 1, 10, 2, lit(robe, 0.12));
+
+    // --- arms (outside the silhouette, so their swing reads) ----------
+    const shRow = shY + 1, shLX = cx - 7, shRX = cx + 6;
+    const offArm = mix(robe, robeSh, 0.45);
+    if (kneel) {
+      const rise = Math.round((breath + 1) * 1.2);
+      const hy = shY + 6 - rise;
+      limb(shLX, shRow + 2, 5, -6, 6, offArm, null);
+      limb(shRX, shRow + 2, -5, -6, 6, shut(robeSh, 0.1), null);
+      R(cx - 2, hy, 5, 3, lit(skin, 0.1)); R(cx + 1, hy, 3, 3, skin);
+      R(cx - 1, hy + 2, 4, 2, skinSh);
+    } else if (mode === 'gesture') {
+      const g = (breath + 1) / 2;                            // the speaking beat
+      limb(shRX, shRow, 1, 0.5, 6, shut(robeSh, 0.08), null);
+      limb(shRX + 5, shRow + 3, 0.12 + g * 0.22, -1, 9, robe, skin);
+      limb(shLX, shRow, -0.10 - breath * 0.04, 1, 12, offArm, skinSh);
+    } else if (mode === 'reach' || mode === 'point') {
+      limb(shRX, shRow, 1, 0.55, 6, shut(robeSh, 0.08), null);
+      if (mode === 'point') limb(shRX + 5, shRow + 3, 1, 0.10, 8, robe, skin);
+      else limb(shRX + 5, shRow + 3, 1, 0.62, 7, robe, skin);
+      limb(shLX, shRow, -0.16, 1, 12, offArm, skinSh);
+    } else if (walk) {
+      const aL = -0.34 * sw, aR = 0.34 * sw;
+      limb(shLX, shRow, Math.sin(aL), Math.cos(aL), 12, offArm, skinSh);
+      limb(shRX, shRow, Math.sin(aR), Math.cos(aR), 12, shut(robeSh, 0.08), skin);
     } else {
-      R(cx - 7, top + 1, 2, 13, mix(robeSh, '#000', 0.12)); R(cx - 7, top + 14, 2, 3, skinSh);
-      R(cx + 6, top + 1, 3, 13, robe); R(cx + 6, top + 14, 3, 3, skin);
+      const aL = -0.05 + breath * 0.05, aR = 0.05 - breath * 0.05;
+      limb(shLX, shRow, Math.sin(aL), Math.cos(aL), 12, offArm, skinSh);
+      limb(shRX, shRow, Math.sin(aR), Math.cos(aR), 12, shut(robeSh, 0.08), skin);
     }
-    // neck + head
-    const hy0 = kneel ? 13 : 9;
-    R(cx - 1, hy0 + 6, 3, 2, skinSh);
-    R(cx - 5, hy0 - 1, 10, 9, skin);
-    R(cx + 3, hy0 - 1, 2, 9, mix(skin, skinSh, 0.35));
-    R(cx - 5, hy0 + 7, 10, 1, mix(skin, skinSh, 0.55));
-    put(cx - 2, hy0 + 4, '#2a1f18'); put(cx + 2, hy0 + 4, '#2a1f18');
-    R(cx - 3, hy0 + 6, 2, 1, mix(skin, skinSh, 0.6));
+
+    // --- neck, head ----------------------------------------------------
+    R(cx - 1, chin + 1, 3, 2, skinSh);
+    const look = Math.round(Math.sin(A + 1.1) * 0.8) + (walk ? Math.round(sw * 0.7) : 0);
+    R(cx - 4, hT, 9, 8, skin);                                  // the skull
+    R(cx + 3, hT, 1, 8, mix(skin, skinSh, 0.40));
+    R(cx - 4, chin, 9, 1, mix(skin, skinSh, 0.55));             // jaw
+    R(cx - 3, hT + 2, 7, 1, mix(skin, skinSh, 0.20));           // brow
+    put(cx - 2 + look, hT + 4, '#2a1f18'); put(cx + 2 + look, hT + 4, '#2a1f18');
+    put(cx - 1, hT + 6, mix(skin, skinSh, 0.55)); put(cx + 1, hT + 6, mix(skin, skinSh, 0.55));
     if (beard) {
-      R(cx - 4, hy0 + 5, 9, 2, hair);
-      R(cx - 3, hy0 + 7, 8, 2, hair);
-      put(cx - 1, hy0 + 7, skinSh); put(cx + 2, hy0 + 7, skinSh);
+      R(cx - 4, hT + 5, 9, 2, hair);
+      R(cx - 3, hT + 7, 8, 2, hair);
+      put(cx - 1, hT + 6, skinSh); put(cx + 2, hT + 6, skinSh);
     }
-    // hair / hood / helmet
     if (helmet) {
-      R(cx - 5, hy0 - 3, 11, 4, '#8e7a44');
-      R(cx - 5, hy0 - 3, 11, 1, '#b09a5c');
-      R(cx - 5, hy0 + 1, 2, 5, '#7a6838'); R(cx + 4, hy0 + 1, 2, 5, '#7a6838');
-      R(cx - 1, hy0 - 6, 3, 4, '#8c2f22');
-      R(cx, hy0 - 7, 1, 2, '#b03a28');
+      R(cx - 5, hT - 2, 11, 4, '#8e7a44');
+      R(cx - 5, hT - 2, 11, 1, '#b09a5c');
+      R(cx - 5, hT + 2, 2, 4, '#7a6838'); R(cx + 4, hT + 2, 2, 4, '#7a6838');
+      R(cx - 1, hT - 5, 3, 2, '#8c2f22');
+      R(cx - 1, hT - 7, 3, 3, '#b03a28');
     } else if (hood) {
-      R(cx - 5, hy0 - 2, 11, 12, hood);
-      R(cx - 4, hy0 - 2, 9, 2, shut(hood, 0.25));
-      R(cx - 3, hy0 + 1, 7, 6, skin);
-      put(cx - 2, hy0 + 4, '#2a1f18'); put(cx + 2, hy0 + 4, '#2a1f18');
-      R(cx - 5, hy0 + 8, 11, 2, shut(hood, 0.3));
+      R(cx - 5, hT - 2, 11, 10, hood);
+      R(cx - 4, hT - 2, 9, 2, shut(hood, 0.25));
+      R(cx - 3, hT + 1, 7, 5, skin);
+      put(cx - 1 + look, hT + 3, '#2a1f18'); put(cx + 2 + look, hT + 3, '#2a1f18');
+      R(cx - 5, hT + 6, 11, 2, shut(hood, 0.3));
     } else {
-      R(cx - 5, hy0 - 2, 11, 4, hair);
-      R(cx - 5, hy0 + 1, 2, 3, hair); R(cx + 4, hy0 + 1, 2, 3, hair);
-      if (female) R(cx - 5, hy0 + 4, 2, 12, hair), R(cx + 4, hy0 + 4, 2, 12, hair);
+      R(cx - 4, hT - 1, 9, 2, hair);                            // cap of hair
+      R(cx - 4, hT - 1, 2, 5, hair); R(cx + 3, hT - 1, 1, 4, shut(hair, 0.2));
+      put(cx - 4, hT + 1, hair); put(cx + 4, hT + 1, shut(hair, 0.2));
+      if (female) { R(cx - 4, hT + 3, 2, 10, hair); R(cx + 3, hT + 3, 2, 10, shut(hair, 0.15)); }
     }
   });
 }
@@ -412,30 +485,42 @@ function crossSprite() {
   });
 }
 
-function scalesSprite() {
+const SCALES_CACHE = new Map();
+/** The balance, tilted: `tilt` -1..1 swings the beam and drops one pan. */
+function scalesSprite(tilt = 0) {
+  const q = Math.round(clamp(tilt, -1, 1) * 4);
+  const hit = SCALES_CACHE.get(q);
+  if (hit) return hit;
+  const T = q / 4;
   const W = 92, H = 86;
-  return paintCanvas(W, H, put => {
-    const G='#e8c078', GL='#ffe6ae', GD='#b08a48', GK='#7a5c2e';
+  const beamY = x => 15 + Math.round(T * (46 - x) / 19);
+  const c = paintCanvas(W, H, put => {
+    const G = '#e8c078', GL = '#ffe6ae', GD = '#b08a48', GK = '#7a5c2e';
     // plinth
     for (let y = H - 8; y < H; y++) for (let x = 28; x < 64; x++) put(x, y, y < H - 3 ? G : GD);
     for (let y = H - 12; y < H - 8; y++) for (let x = 34; x < 58; x++) put(x, y, GL);
     // post
-    for (let y = 16; y < H - 12; y++) for (let x = 44; x < 49; x++) put(x, y, x < 46 ? GL : G);
-    // beam
-    for (let x = 8; x < 85; x++) { put(x, 14, GL); put(x, 15, G); put(x, 16, GD); }
-    for (let y = 8; y < 14; y++) for (let x = 43; x < 50; x++) put(x, y, y < 11 ? GL : G);
+    for (let y = 14; y < H - 12; y++) for (let x = 44; x < 49; x++) put(x, y, x < 46 ? GL : G);
+    // beam, rocking on its pivot
+    for (let x = 6; x < 87; x++) { const y = beamY(x); put(x, y, GL); put(x, y + 1, G); put(x, y + 2, GD); }
+    for (let y = 8; y < 15; y++) for (let x = 43; x < 50; x++) put(x, y, y < 11 ? GL : G);
     // chains and pans
     for (const px of [16, 76]) {
-      for (let y = 17; y < 40; y++) put(px, y, GK);
-      for (let y = 17; y < 30; y++) { put(px - 3, y, GK); put(px + 3, y, GK); }
+      const top = beamY(px) + 2;
+      const drop = Math.round(T * (px < 46 ? 4.5 : -4.5));
+      const panY = 40 + drop;
+      for (let y = top; y < panY; y++) put(px, y, GK);
+      for (let y = top; y < panY - 8; y++) { put(px - 3, y, GK); put(px + 3, y, GK); }
       for (let x = px - 13; x <= px + 13; x++) {
         const d = Math.abs(x - px);
-        const yy = 40 + Math.round(d * d / 26);
+        const yy = panY + Math.round(d * d / 26);
         for (let y = yy; y < yy + 4; y++) put(x, y, y < yy + 2 ? GL : G);
       }
-      for (let x = px - 13; x <= px + 13; x++) put(x, 44 + Math.round((x - px) * (x - px) / 26), GD);
+      for (let x = px - 13; x <= px + 13; x++) put(x, panY + 4 + Math.round((x - px) * (x - px) / 26), GD);
     }
   });
+  SCALES_CACHE.set(q, c);
+  return c;
 }
 
 function lampSprite() {
@@ -500,6 +585,7 @@ function rockSprite(seed) {
 
 // ---------------------------------------------------------------- camera
 let CAM = { x: 0, y: 6.0, z: 8.0, f: 880, hy: 205 };
+let T0 = 0, T1 = 1;               // the span of the shot being drawn
 const P = (x, y, z) => {
   const dz = z - CAM.z;
   const s = CAM.f / Math.max(dz, 0.4);
@@ -527,7 +613,7 @@ const PEOPLE = {
   woman:      { robe: '#bd8f8a', robeSh: '#96706c', female: true, pose: 'kneel', hair: '#33261e' },
   abraham:    { robe: '#c6ac86', robeSh: '#9c8564', beard: true, hair: '#c8c0b0', pose: 'kneel' },
   traveler:   { robe: '#9a8464', robeSh: '#77644a', hood: '#4e4030', cloak: '#6a563e', pose: 'walk' },
-  angel:      { robe: '#fbf3dc', robeSh: '#dccfae', wings: true, hair: '#e6cf90', skin: '#f4e6cc', pose: 'stand' },
+  angel:      { robe: '#fbf3dc', robeSh: '#dccfae', wings: true, hair: '#e6cf90', skin: '#f4e6cc', pose: 'stand', noLegs: true },
 };
 const initSprites = () => {
   for (const k of Object.keys(PEOPLE)) SP[k] = personSprite(PEOPLE[k]);
@@ -549,6 +635,48 @@ const initSprites = () => {
   SP.tufts = [tuftSprite(3), tuftSprite(8), tuftSprite(11)];
 };
 
+// ---------------------------------------------------------------- animation
+const PERSON_FRAMES = new Map();
+const CYCLE = 8;                 // frames in one walk / breath cycle
+function personFrame(name, mode, phase) {
+  const key = name + '|' + mode;
+  let arr = PERSON_FRAMES.get(key);
+  if (!arr) {
+    const cfg = PEOPLE[name] || {};
+    arr = Array.from({ length: CYCLE }, (_, i) => personSprite(cfg, mode, i / CYCLE));
+    PERSON_FRAMES.set(key, arr);
+  }
+  const i = Math.floor((((phase % 1) + 1) % 1) * CYCLE) % CYCLE;
+  return arr[i];
+}
+/** Draw a person mid-action. Walking phase is passed in metres travelled. */
+function drawPerson(name, x, y, z, hM, pal, o = {}) {
+  const mode = o.mode || 'idle';
+  const speed = o.speed ?? (mode === 'walk' ? 1.0 : 0.42);
+  const phase = o.phase ?? ((o.t ?? 0) * speed + (o.offset ?? 0));
+  drawSprite(personFrame(name, mode, phase), x, y, z, hM, pal,
+    { light: o.light, shadow: o.shadow, alpha: o.alpha });
+}
+/**
+ * A straight walk from a to b between t0 and t1, then a hold. The walk phase
+ * advances with distance covered, not with time, so the feet never skate.
+ */
+function track(t, a, b, t0, t1, o = {}) {
+  const k = clamp((t - t0) / Math.max(1e-3, t1 - t0));
+  const e = o.ease ? o.ease(k) : k;
+  const x = lerp(a[0], b[0], e), z = lerp(a[1], b[1], e);
+  const dist = Math.hypot(b[0] - a[0], b[1] - a[1]) * e;
+  const moving = t > t0 && t < t1;
+  return { x, z, moving, phase: dist / (o.cycle ?? 1.35), mode: moving ? 'walk' : (o.hold ?? 'idle') };
+}
+/** Draw a tracked walker: walks the line, then holds in whatever pose is asked. */
+function walker(name, tr, hM, pal, o = {}) {
+  const mode = tr.mode === 'walk' ? 'walk' : (o.holdMode ?? 'idle');
+  drawPerson(name, tr.x, 0, tr.z, hM, pal, { ...o, mode, phase: tr.mode === 'walk' ? tr.phase : undefined });
+}
+/** Flame / lantern flicker, 0..1, so every light in the film breathes. */
+const flick = (t, seed = 0) => 0.72 + 0.28 * (0.6 * Math.sin(t * 6.7 + seed * 3.1) + 0.4 * Math.sin(t * 11.3 - seed * 1.7));
+
 // ---------------------------------------------------------------- drawing helpers
 function drawSprite(sprite, wx, wy, wz, heightM, pal, opts = {}) {
   const p = P(wx, wy, wz);
@@ -559,7 +687,10 @@ function drawSprite(sprite, wx, wy, wz, heightM, pal, opts = {}) {
   const light = clamp(opts.light ?? lightOf(wx, wz, pal, LIGHT_SRC));
   const img = variant({ c: sprite, key: spriteKey(sprite) }, fog, light, pal.ink, pal.fog, pal.warm);
   g.imageSmoothingEnabled = false;
+  const a0 = g.globalAlpha;
+  if (opts.alpha != null) g.globalAlpha = a0 * clamp(opts.alpha);
   g.drawImage(img, Math.round(p.x - w / 2), Math.round(p.y - h), Math.round(w), Math.round(h));
+  g.globalAlpha = a0;
   // contact shadow, thrown away from the lantern
   if (opts.shadow !== false) {
     const shW = w * 0.46, shH = Math.max(1.2, h * 0.055);
@@ -764,12 +895,26 @@ function setVillage(t, pal, opts = {}) {
   drawSprite(SP.huts[0], -6.4, 0, HZ + 7, 2.7, pal, { light: 0.18 });
   drawSprite(SP.huts[0], -1.1, 0, HZ, 3.1, pal, { light: 0.95 });
   const door = P(-1.1, 0.1, HZ - 1.3);
-  pool(door.x, door.y, 5.4 * door.s, 1.9 * door.s, 'rgba(255,196,110,ALPHA)', 0.26);
-  glow(door.x, door.y - 1.5 * door.s, 40, 'rgb(255,186,110)', 0.26);
+  const doorFl = flick(t, 1);
+  pool(door.x, door.y, 5.4 * door.s, 1.9 * door.s, 'rgba(255,196,110,ALPHA)', 0.24 * doorFl);
+  glow(door.x, door.y - 1.5 * door.s, 40 * (0.92 + 0.08 * doorFl), 'rgb(255,186,110)', 0.26 * doorFl);
   drawSprite(SP.trees[0], -8.4, 0, HZ + 9, 2.5, pal, { light: 0.2 });
   drawSprite(SP.trees[1], 8.2, 0, HZ + 4, 2.1, pal, { light: 0.2 });
   for (let i = 0; i < 4; i++) drawSprite(SP.rocks[i % 3], -9 + hash(i) * 18, 0, 24 + i * 2, 0.45, pal, { light: 0.3 });
-  if (opts.man !== false) drawSprite(SP.man, -2.6, 0, HZ - 3.6, 1.74, pal, { light: 0.95 });
+  if (opts.man === 'across') {
+    // crossing the yard, lantern-lit, in the sepia of shot nine
+    const tr = track(t, [-4.6, 25.0], [2.6, 24.6], T0 + 0.35, T0 + 8.4);
+    walker('man', tr, 1.74, pal, { t, light: 0.62 });
+  } else if (opts.exit) {
+    // out of the lit doorway and into the night
+    const tr = track(t, [-1.15, 29.4], [-2.5, 27.6], T0 + 0.5, T0 + 3.6);
+    walker('man', tr, 1.74, pal, { t, light: clamp(1.0 - Math.hypot(tr.x + 1.1, tr.z - 29.7) * 0.055, 0.35, 1) });
+  } else if (opts.man !== false) {
+    // up out of the dark, into the doorway light, and a hand on the door
+    const tr = track(t, [-3.2, 23.4], [-1.75, 27.4], T0 + 0.4, T0 + 6.4);
+    const dl = Math.hypot(tr.x + 1.1, tr.z - 29.7);
+    walker('man', tr, 1.74, pal, { t, holdMode: t > T0 + 7.7 ? 'reach' : 'idle', light: clamp(1.0 - dl * 0.055, 0.3, 1) });
+  }
   motes(t, 30, 0.5);
 }
 
@@ -834,12 +979,26 @@ function setStreet(t, pal, opts = {}) {
   floorBeam(0.16, 0.24, 0.06, 0.66, 'rgba(255,226,170,ALPHA)', 0.16);
   motes(t, 30, 0.4);
   if (opts.people !== false) {
-    drawSprite(SP.roman, 1.0, 0, 21.4, 1.74, pal, { light: 0.7 });
-    drawSprite(SP.servant, 2.8, 0, 22.3, 1.66, pal, { light: 0.6 });
+    // the Roman crosses the street and stops to point the way; the servant follows
+    const rTr = track(t, [-1.9, 21.4], [1.5, 21.4], T0 + 0.25, T0 + 4.6);
+    if (t > T0 + 6.6) drawPerson('roman', rTr.x, 0, rTr.z, 1.74, pal, { mode: 'point', t });
+    else walker('roman', rTr, 1.74, pal, { t });
+    const sTr = track(t, [-3.0, 22.8], [0.3, 22.8], T0 + 0.7, T0 + 5.4);
+    walker('servant', sTr, 1.66, pal, { t });
   }
   if (opts.meet) {
-    drawSprite(SP.peter, 0.7, 0, 21.5, 1.76, pal, { light: 0.85 });
-    drawSprite(SP.roman, 3.0, 0, 21.9, 1.76, pal, { light: 0.85 });
+    // Peter in from the left, Cornelius from the right, and they stop facing one another
+    const pT = track(t, [-1.9, 21.2], [0.35, 21.4], T0 + 0.1, T0 + 2.9);
+    const cT = track(t, [3.9, 22.0], [2.5, 21.9], T0 + 0.1, T0 + 2.9);
+    const greet = t > T0 + 3.6;
+    if (greet) drawPerson('peter', pT.x, 0, pT.z, 1.76, pal, { mode: 'reach', t });
+    else walker('peter', pT, 1.76, pal, { t });
+    walker('cornelius', cT, 1.76, pal, { t, holdMode: greet ? 'reach' : 'idle' });
+  }
+  if (opts.meetStill) {
+    // same blocking, held: under the quote card
+    drawPerson('peter', 0.35, 0, 21.4, 1.76, pal, { mode: t < T0 + 1.6 ? 'reach' : 'idle', t });
+    drawPerson('cornelius', 2.5, 0, 21.9, 1.76, pal, { mode: t < T0 + 1.6 ? 'reach' : 'idle', t, offset: 0.4 });
   }
 }
 
@@ -859,11 +1018,16 @@ function setAthens(t, pal, opts = {}) {
   const ap = P(0.5, 0.1, 20.5);
   pool(ap.x, ap.y, 28, 9, 'rgba(255,236,180,ALPHA)', 0.22);
   if (opts.worshippers !== false) {
-    drawSprite(SP.worshipper, -1.9, 0, 21.4, 1.56, pal, { light: 0.75 });
-    drawSprite(SP.worshipper2, 2.4, 0, 22.0, 1.56, pal, { light: 0.65 });
-    drawSprite(SP.woman, 3.9, 0, 23.0, 1.56, pal, { light: 0.55 });
+    drawPerson('worshipper', -1.9, 0, 21.4, 1.42, pal, { mode: 'kneel', t, light: 0.92, offset: 0.0 });
+    drawPerson('worshipper2', 2.4, 0, 22.0, 1.42, pal, { mode: 'kneel', t, light: 0.82, offset: 0.33 });
+    drawPerson('woman', 3.9, 0, 23.0, 1.42, pal, { mode: 'kneel', t, light: 0.72, offset: 0.61 });
   }
-  if (opts.paul) drawSprite(SP.paul, -4.2, 0, 19.6, 1.74, pal, { light: 0.8 });
+  if (opts.paul) {
+    // Paul walks in across the agora, then turns to the altar and speaks
+    const tr = track(t, [4.8, 20.2], [-1.5, 20.2], T0 + 0.1, T0 + 3.7);
+    if (t > T0 + 3.9) drawPerson('paul', tr.x, 0, tr.z, 1.74, pal, { mode: 'gesture', t });
+    else walker('paul', tr, 1.74, pal, { t });
+  }
   floorBeam(0.14, 0.26, 0.04, 0.68, 'rgba(255,226,170,ALPHA)', 0.12);
   motes(t, 28, 0.4);
 }
@@ -874,10 +1038,20 @@ function setDesert(t, pal, opts = {}) {
   drawSprite(SP.cross, 0.2, 0, 22, 3.4, pal, { light: 0.8 });
   for (let i = 0; i < 5; i++) drawSprite(SP.rocks[i % 3], -10 + i * 5.2, 0, 16 + i * 2, 0.45, pal);
   if (opts.groups) {
+    // two groups coming in toward the cross
     for (let i = 0; i < 3; i++) {
-      drawSprite(i === 1 ? SP.woman : SP.worshipper, -4.4 + i * 0.9, 0, 19.2 + i * 0.6, 1.6, pal, { light: 0.55 });
-      drawSprite(i === 1 ? SP.woman : SP.servant, 4.0 - i * 0.9, 0, 19.8 + i * 0.6, 1.6, pal, { light: 0.5 });
+      const lTr = track(t, [-3.6 - i * 0.45, 18.6 + i * 0.5], [-2.7 - i * 0.45, 18.6 + i * 0.5], T0 + 0.6 + i * 0.28, T0 + 4.3 + i * 0.28);
+      walker(i === 1 ? 'woman' : 'worshipper', lTr, 1.6, pal, { t, offset: i * 0.31, light: 0.55 });
+      const rTr = track(t, [3.7 + i * 0.45, 19.0 + i * 0.5], [2.8 + i * 0.45, 19.0 + i * 0.5], T0 + 0.6 + i * 0.3, T0 + 4.3 + i * 0.3);
+      walker(i === 1 ? 'woman' : 'servant', rTr, 1.6, pal, { t, offset: 0.5 + i * 0.27, light: 0.5 });
     }
+  }
+  if (opts.coming) {
+    // two figures in the foreground, walking up to the cross in the light
+    const aTr = track(t, [-2.6, 19.6], [-1.5, 19.7], T0 + 0.4, T0 + 4.6);
+    const bTr = track(t, [2.9, 19.9], [1.55, 20.0], T0 + 0.7, T0 + 4.9);
+    walker('man', aTr, 1.7, pal, { t, light: 0.6 });
+    walker('worshipper', bTr, 1.62, pal, { t, light: 0.55 });
   }
   motes(t, 26, 0.35);
   if (opts.beam) {
@@ -897,14 +1071,15 @@ function setScales(t, pal, opts = {}) {
   floorPlane(pal, t, { top: cor });
   floorBeam(0.14, 0.30, 0.04, 0.78, 'rgba(255,216,160,ALPHA)', 0.16);
   const p = P(0.2, 1.25, 20);
-  drawSprite(SP.scales, 0.2, 1.2, 20, 2.7, pal, { light: 0.95, shadow: false });
+  const tilt = Math.sin(t * 0.55) * 0.62 + Math.sin(t * 0.23 + 1.7) * 0.38;
+  drawSprite(scalesSprite(tilt), 0.2, 1.2, 20, 2.7, pal, { light: 0.95, shadow: false });
   pool(p.x, p.y + 46, 66, 20, 'rgba(255,214,150,ALPHA)', 0.22);
   // a hanging lamp, so the room has a source
   const lampX = ART_W * 0.80, lampY = ART_H * 0.20;
   g.fillStyle = 'rgba(30,14,8,0.5)'; g.fillRect(lampX, 0, 1, lampY - 6);
   g.fillStyle = '#c98a44'; g.fillRect(lampX - 5, lampY - 6, 11, 8);
-  g.fillStyle = '#ffe3ac'; g.fillRect(lampX - 4, lampY + 2, 9, 3);
-  glow(lampX, lampY, 70, 'rgb(255,206,140)', 0.35);
+  g.fillStyle = '#ffe3ac'; g.fillRect(lampX - 4, lampY + 2, 9, Math.max(2, Math.round(3 * flick(t, 2))));
+  glow(lampX, lampY, 70 * (0.94 + 0.06 * flick(t, 2)), 'rgb(255,206,140)', 0.35 * flick(t, 2));
   if (opts.shelf) drawSprite(SP.altar, 5.4, 0, 24, 0.9, pal, { light: 0.4 });
   motes(t, 26, 0.4);
 }
@@ -917,7 +1092,9 @@ function setRoad(t, pal, opts = {}) {
   for (let i = 0; i < 5; i++) drawSprite(SP.rocks[i % 3], -8 + i * 4.2, 0, 14 + i * 2.5, 0.4, pal);
   floorBeam(0.22, 0.26, 0.10, 0.72, 'rgba(190,208,238,ALPHA)', 0.08);
   for (let i = 0; i < 6; i++) drawSprite(SP.tufts[i % 3], -6 + i * 2.6, 0, 13 + i * 0.8, 0.42, pal, { shadow: false });
-  drawSprite(SP.traveler, 0.4, 0, 19, 1.76, pal, { light: 0.55 });
+  // the traveller comes up the road toward the camera, and the road grows
+  const tr = track(t, [1.0, 22.6], [0.35, 18.3], T0 + 0.15, T0 + 3.9);
+  walker('traveler', tr, 1.76, pal, { t, holdMode: 'idle' });
   motes(t, 26, 0.35);
 }
 
@@ -928,14 +1105,21 @@ function setHandoff(t, pal) {
   drawSprite(SP.huts[0], 3.0, 0, 26, 3.0, pal, { light: 0.6 });
   const door = P(3.0, 0.1, 24.7);
   pool(door.x, door.y, 5.0 * door.s, 1.6 * door.s, 'rgba(255,196,110,ALPHA)', 0.24);
-  drawSprite(SP.man, -0.9, 0, 19.7, 1.76, pal, { light: 0.65 });
-  drawSprite(SP.worshipper, 2.1, 0, 20.0, 1.72, pal, { light: 0.8 });
-  const lp = P(0.6, 1.02, 19.8);
-  drawSprite(SP.lamp, 0.6, 0.94, 19.8, 0.30, pal, { light: 1.0, shadow: false });
-  glow(lp.x, lp.y, 26, 'rgb(255,206,130)', 0.5);
-  glow(lp.x, lp.y, 78, 'rgb(255,180,110)', 0.28);
-  glow(lp.x, lp.y, 190, 'rgb(255,170,100)', 0.10);
-  pool(lp.x, lp.y + 16, 32, 11, 'rgba(255,200,130,ALPHA)', 0.28);
+  // two people step in and the lamp passes from one hand to the other
+  const step = smooth(seg(t, T0 + 0.15, T0 + 1.3));
+  const pass = smooth(seg(t, T0 + 1.7, T0 + 3.3));
+  const manX = lerp(-1.55, -0.25, step), womX = lerp(2.6, 1.32, step);
+  drawPerson('man', manX, 0, 19.7, 1.76, pal, { mode: t < T0 + 2.3 ? 'reach' : 'idle', t, light: 0.8 });
+  drawPerson('worshipper', womX, 0, 20.0, 1.72, pal, { mode: t > T0 + 1.5 ? 'reach' : 'idle', t, light: 0.85, offset: 0.4 });
+  const lampX = lerp(manX + 0.44, womX - 0.44, pass);
+  const lampY = 0.98 - Math.sin(pass * Math.PI) * 0.10 + Math.sin(t * 5.1) * 0.012;
+  const lp = P(lampX, lampY + 0.30, 19.85);
+  drawSprite(SP.lamp, lampX, lampY, 19.85, 0.30, pal, { light: 1.0, shadow: false });
+  const fl = flick(t, 3);
+  glow(lp.x, lp.y, 26, 'rgb(255,206,130)', 0.5 * fl);
+  glow(lp.x, lp.y, 78, 'rgb(255,180,110)', 0.28 * fl);
+  glow(lp.x, lp.y, 190, 'rgb(255,170,100)', 0.10 * fl);
+  pool(lp.x, lp.y + 16, 32, 11, 'rgba(255,200,130,ALPHA)', 0.28 * fl);
   for (let i = 0; i < 4; i++) drawSprite(SP.rocks[i % 3], -7 + i * 3.2, 0, 14 + i, 0.4, pal, { light: 0.3 });
   motes(t, 26, 0.4);
 }
@@ -949,28 +1133,32 @@ function camFor(o = {}) {
   const s = ((o.size ?? 0.20) * ART_H) / hM;
   const dz = f / s;
   const feetY = (o.feet ?? 0.80) * ART_H;
-  return { x: o.x ?? 0, y: (feetY - hy) / s, z: subjZ - dz, f, hy };
+  return { x: o.x ?? 0, y: (feetY - hy) / s, z: subjZ - dz, f, hy, dz };
 }
 const SHOTS = [
   { // 01 · 0:00 — the village at night, one hut lit, one man in the light
-    t0: 0, t1: 10, pal: 'NIGHTV', cam: camFor({ x: -0.4, z: 27.4, size: 0.13, feet: 0.80 }),
+    t0: 0, t1: 10, pal: 'NIGHTV', cam: camFor({ x: -0.4, z: 27.0, size: 0.155, feet: 0.80 }),
+    move: { push: 0.15, side: 0.45 },
     focus: 0.58, blur: 5.5, light: { x: -0.4, z: 16, r: 9 },
     draw(t, pal) { setVillage(t, pal, { light: 0.55 }); },
   },
   { // 02 · 0:10 — the questions people actually leave in the comments
-    t0: 10, t1: 15, pal: 'NIGHTV', cam: camFor({ x: 0.2, z: 27.4, size: 0.13, feet: 0.84 }),
+    t0: 10, t1: 15, pal: 'NIGHTV', cam: camFor({ x: 0.2, z: 27.0, size: 0.15, feet: 0.84 }),
+    move: { push: 0.08, side: -0.35 },
     focus: 0.54, blur: 5, light: { x: -0.4, z: 16, r: 8 },
     section: { text: 'HONEST QUESTIONS', in: 10.1, out: 14.9 },
     bubbles: true,
-    draw(t, pal) { setVillage(t, pal, { light: 0.4 }); },
+    draw(t, pal) { setVillage(t, pal, { light: 0.4, man: false }); },
   },
   { // 03 · 0:15 — Caesarea: a Roman and his servant on the street
-    t0: 15, t1: 25, pal: 'GOLD', cam: camFor({ x: 0.8, z: 21.5, size: 0.155 }),
+    t0: 15, t1: 25, pal: 'GOLD', cam: camFor({ x: 0.8, z: 21.5, size: 0.21 }),
+    move: { push: 0.11, side: 1.15 },
     focus: 0.60, blur: 5, light: { x: 0.6, z: 21, r: 13 },
     draw(t, pal) { setStreet(t, pal); },
   },
   { // 04 · 0:25 — Cornelius on his knees, columns behind
-    t0: 25, t1: 30, pal: 'GOLD', cam: camFor({ x: 0.1, z: 18.6, size: 0.26, feet: 0.82, f: 980 }),
+    t0: 25, t1: 30, pal: 'GOLD', cam: camFor({ x: 0.05, z: 18.6, size: 0.38, feet: 0.80, f: 980 }),
+    move: { push: 0.13, rise: 0.22 },
     focus: 0.62, blur: 5.5, light: { x: 0.1, z: 17, r: 8 },
     draw(t, pal) {
       setGoldenRoom(t, pal, {
@@ -978,77 +1166,88 @@ const SHOTS = [
         extra(t2, p2, sx) {
           drawSprite(SP.column, -1.9, 0, 21.5, 4.6, p2, { light: 0.5 });
           drawSprite(SP.column, 2.3, 0, 22.4, 4.6, p2, { light: 0.4 });
-          drawSprite(SP.corneliusKneel, 0.35, 0, 18.6, 1.34, p2, { light: 0.95 });
+          drawPerson('corneliusKneel', 0.35, 0, 18.6, 1.45, p2, { mode: 'kneel', t: t2, light: 0.95 });
         },
       });
     },
   },
   { // 05 · 0:30 — the angel in the shaft of light
     t0: 30, t1: 35, pal: 'GOLD', cam: camFor({ x: 0.2, z: 19.0, size: 0.30, feet: 0.84, f: 980 }),
+    move: { push: 0.10, rise: 0.30 },
     focus: 0.55, blur: 6, light: { x: 0.2, z: 16, r: 9 },
     draw(t, pal) {
       setGoldenRoom(t, pal, {
         beamX: 0.5, sparkle: true,
         extra(t2, p2, sx) {
-          drawSprite(SP.angel, 0.1, 1.1, 19.2, 2.5, p2, { light: 1.0, shadow: false });
-          glow(P(0.1, 3.2, 19.2).x, P(0.1, 3.2, 19.2).y, 54, 'rgb(255,240,200)', 0.42);
+          // the angel comes down the shaft and hangs there, wings moving
+          const desc = lerp(2.35, 1.45, smooth(seg(t2, T0 + 0.4, T0 + 3.7)));
+          drawPerson('angel', 0.1, desc, 19.2, 2.15, p2, { mode: 'idle', t: t2, light: 1.0, shadow: false, speed: 0.55 });
+          const hp = P(0.1, desc + 1.9, 19.2);
+          glow(hp.x, hp.y, 54, 'rgb(255,240,200)', 0.42);
           glow(sx, P(0.1, 1.9, 19.0).y, 60, 'rgb(255,238,190)', 0.5);
-          drawSprite(SP.corneliusKneel, -0.5, 0, 18.6, 1.34, p2, { light: 0.9 });
-          drawSprite(SP.servant, 1.9, 0, 19.4, 1.58, p2, { light: 0.7 });
+          drawPerson('corneliusKneel', -0.5, 0, 18.6, 1.45, p2, { mode: 'kneel', t: t2, light: 0.9 });
+          drawPerson('servant', 1.9, 0, 19.4, 1.58, p2, { mode: 'idle', t: t2, light: 0.7, offset: 0.3 });
           sparkles(sx, ART_H * 0.62, 80, 40, t2 * 1.4);
         },
       });
     },
   },
   { // 06 · 0:35 — Peter and Cornelius, face to face
-    t0: 35, t1: 40, pal: 'GOLD', cam: camFor({ x: 1.4, z: 21.7, size: 0.16 }),
+    t0: 35, t1: 40, pal: 'GOLD', cam: camFor({ x: 1.45, z: 21.7, size: 0.215 }),
+    move: { push: 0.15 },
     focus: 0.60, blur: 5.5, light: { x: 1.4, z: 20, r: 10 },
     draw(t, pal) { setStreet(t, pal, { meet: true }); },
   },
   { // 07 · 0:40 — the key verse on a cream card, the scene ghosted behind
-    t0: 40, t1: 50, pal: 'GOLD', cam: camFor({ x: 1.4, z: 21.7, size: 0.16 }),
+    t0: 40, t1: 50, pal: 'GOLD', cam: camFor({ x: 1.45, z: 21.7, size: 0.215 }),
+    move: { push: 0.09, side: -0.3 },
     focus: 0.62, blur: 6.5, light: { x: 1.4, z: 20, r: 10 },
-    draw(t, pal) { setStreet(t, pal, { meet: true }); },
+    draw(t, pal) { setStreet(t, pal, { people: false, meetStill: true }); },
     quote: {
       in: 40.7, out: 49.4, size: 37, source: 'ACTS 10:34–35 · KJV',
       text: 'God is no *respecter* of persons: but in every nation he that *feareth* him, and worketh righteousness, is *accepted* with him.',
     },
   },
   { // 08 · 0:50 — the beam finds the hut: answer one
-    t0: 50, t1: 55, pal: 'NIGHTV', cam: camFor({ x: -0.2, z: 29, size: 0.14, feet: 0.86 }),
+    t0: 50, t1: 55, pal: 'NIGHTV', cam: camFor({ x: -0.2, z: 28.6, size: 0.17, feet: 0.80 }),
+    move: { push: 0.12, side: -0.3 },
     focus: 0.60, blur: 5.5, light: { x: -0.5, z: 17, r: 8 },
     badge: { n: '1', text: 'GOD SEES THE SEEKER', in: 50.5, out: 54.9 },
     draw(t, pal) {
-      setVillage(t, pal, { light: 0.7, man: false });
+      setVillage(t, pal, { light: 0.7, exit: true });
       const h = P(-0.4, 2.2, 20);
       shaft(h.x, ART_H * 0.12, h.y, 6, 26, 'rgba(210,226,255,ALPHA)', 0.30, t);
       sparkles(h.x, h.y, 50, 18, t, 'rgba(220,232,255,');
     },
   },
   { // 09 · 0:55 — sepia village, Romans 1 beginning to type
-    t0: 55, t1: 65, pal: 'DUSKPLAIN', cam: camFor({ x: -0.6, z: 27.4, size: 0.13, feet: 0.82 }),
+    t0: 55, t1: 65, pal: 'DUSKPLAIN', cam: camFor({ x: -0.6, z: 27.4, size: 0.14, feet: 0.78 }),
+    move: { push: 0.09, side: 1.0 },
     focus: 0.58, blur: 6, light: { x: -0.4, z: 17, r: 8 },
     badge: { n: '2', text: 'NO ONE HAS ZERO LIGHT', in: 55.4, out: 59.6 },
     quote: {
       in: 59.8, out: 64.7, size: 30, type: 3.4, source: 'ROMANS 1:20 · KJV',
       text: 'For the invisible things of him from the creation of the world are clearly *seen*, being understood by the things that are made.',
     },
-    draw(t, pal) { setVillage(t, pal, { light: 0.45, man: true }); },
+    draw(t, pal) { setVillage(t, pal, { light: 0.45, man: 'across' }); },
   },
   { // 10 · 1:05 — Athens, and Paul walking in
-    t0: 65, t1: 70, pal: 'GOLD', cam: camFor({ x: 0.6, z: 20, size: 0.145 }),
+    t0: 65, t1: 70, pal: 'GOLD', cam: camFor({ x: 0.6, z: 20, size: 0.19 }),
+    move: { push: 0.10, side: -1.2 },
     focus: 0.60, blur: 5, light: { x: 0.4, z: 20, r: 12 },
     section: { text: 'NEVER HEARD', in: 65.1, out: 69.9 },
     draw(t, pal) { setAthens(t, pal, { paul: true }); },
   },
   { // 11 · 1:10 — the altar, and its inscription
-    t0: 70, t1: 75, pal: 'GOLD', cam: camFor({ x: 0.4, z: 19.5, size: 0.17, f: 980 }),
+    t0: 70, t1: 75, pal: 'GOLD', cam: camFor({ x: 0.4, z: 19.5, size: 0.20, f: 980 }),
+    move: { push: 0.11, rise: 0.12 },
     focus: 0.62, blur: 6, light: { x: 0.4, z: 18, r: 7 },
     draw(t, pal) { setAthens(t, pal, { paul: false }); },
     labels: [{ text: 'TO THE UNKNOWN GOD', x: 0.5, y: 0.50, in: 70.5, out: 74.9 }],
   },
   { // 12 · 1:15 — the scales
     t0: 75, t1: 85, pal: 'RUST', cam: camFor({ x: 0.2, z: 20, size: 0.24, f: 980 }),
+    move: { push: 0.13, rise: 0.16 },
     focus: 0.58, blur: 5.5, light: { x: 0.2, z: 16, r: 11 },
     badge: { n: '3', text: 'GOD JUDGES FAIRLY', in: 75.4, out: 79.5 },
     quote: {
@@ -1059,12 +1258,13 @@ const SHOTS = [
   },
   { // 13 · 1:25 — Abraham, pleading
     t0: 85, t1: 95, pal: 'RUST', cam: camFor({ x: -0.2, z: 18, size: 0.22 }),
+    move: { push: 0.13, side: -0.35 },
     focus: 0.58, blur: 6, light: { x: 0.0, z: 17, r: 9 },
     draw(t, pal) {
       setGoldenRoom(t, pal, {
         beamX: 0.46,
         extra(t2, p2, sx) {
-          drawSprite(SP.abraham, -0.2, 0, 18.0, 1.7, p2, { light: 0.9 });
+          drawPerson('abraham', -0.2, 0, 18.0, 1.7, p2, { mode: 'gesture', t: t2, light: 0.9, speed: 0.42 });
           const tb = P(3.0, 0, 26.5);
           horizonBand(p2, tb.y - 6, 34);
           townGround(p2, tb.x, tb.y, 190);
@@ -1078,6 +1278,7 @@ const SHOTS = [
   },
   { // 14 · 1:35 — ten points of light over the city
     t0: 95, t1: 105, pal: 'RUST', cam: camFor({ x: 0.0, z: 17.4, size: 0.17 }),
+    move: { push: 0.12, rise: 0.18 },
     focus: 0.55, blur: 6.5, light: { x: 0.0, z: 17, r: 9 },
     labels: [{ text: 'TEN RIGHTEOUS — GENESIS 18:32', x: 0.5, y: 0.815, in: 97.4, out: 104.8 }],
     draw(t, pal) {
@@ -1092,7 +1293,7 @@ const SHOTS = [
             const hz = 26 + (i % 3) * 2.0;
             drawSprite(SP.huts[i % 2], hx, 0, hz, 1.05 + (i % 3) * 0.13, p2, { light: 0.32 });
           }
-          drawSprite(SP.abraham, -1.6, 0, 17.4, 1.7, p2, { light: 0.85 });
+          drawPerson('abraham', -1.6, 0, 17.4, 1.7, p2, { mode: 'gesture', t: t2, light: 0.85, speed: 0.38, offset: 0.25 });
           // ten lights, rising one by one
           for (let i = 0; i < 10; i++) {
             const k = smooth(seg(t2, 96.0 + i * 0.42, 96.7 + i * 0.42));
@@ -1110,6 +1311,7 @@ const SHOTS = [
   },
   { // 15 · 1:45 — the plain, the cross, the two readings
     t0: 105, t1: 110, pal: 'DUSKPLAIN', cam: camFor({ x: 0.4, z: 22, size: 0.20, feet: 0.80, h: 3.4 }),
+    move: { push: 0.05, side: -0.35 },
     focus: 0.52, blur: 5, light: { x: 0.2, z: 22, r: 16 },
     labels: [
       { text: 'HEAR AND TRUST IN THIS LIFE', x: 0.5, y: 0.325, in: 105.9, out: 109.9 },
@@ -1118,31 +1320,36 @@ const SHOTS = [
     draw(t, pal) { setDesert(t, pal, { groups: true }); },
   },
   { // 16 · 1:50 — the light lands on the cross
-    t0: 110, t1: 120, pal: 'DUSKPLAIN', cam: camFor({ x: 0.2, z: 22, size: 0.30, feet: 0.88, h: 3.4 }),
+    t0: 110, t1: 120, pal: 'DUSKPLAIN', cam: camFor({ x: 0.2, z: 22, size: 0.34, feet: 0.86, h: 3.4 }),
+    move: { push: 0.14, rise: 0.28 },
     focus: 0.54, blur: 6, light: { x: 0.2, z: 22, r: 14 },
     badge: { n: '+', text: 'SAVED ONLY THROUGH JESUS', in: 111.2, out: 119.4 },
     draw(t, pal) {
-      setDesert(t, pal, { groups: true, beam: true });
+      setDesert(t, pal, { coming: true, beam: true });
     },
   },
   { // 17 · 2:00 — the road, and the turn in Romans 10
-    t0: 120, t1: 125, pal: 'NIGHTROAD', cam: camFor({ x: 0.5, z: 19, size: 0.24, feet: 0.82 }),
+    t0: 120, t1: 125, pal: 'NIGHTROAD', cam: camFor({ x: 0.5, z: 19, size: 0.30, feet: 0.86 }),
+    move: { push: 0.05, side: -0.25 },
     focus: 0.58, blur: 6, light: { x: 0.6, z: 16, r: 8 },
     draw(t, pal) { setRoad(t, pal); },
   },
   { // 18 · 2:05 — a lamp, handed over
-    t0: 125, t1: 130, pal: 'NIGHTV', cam: camFor({ x: 0.3, z: 19.8, size: 0.26, feet: 0.84 }),
+    t0: 125, t1: 130, pal: 'NIGHTV', cam: camFor({ x: 0.55, z: 19.8, size: 0.31, feet: 0.87 }),
+    move: { push: 0.13 },
     focus: 0.54, blur: 6.5, light: { x: 0.2, z: 19, r: 9 },
     draw(t, pal) { setHandoff(t, pal); },
   },
   { // 19 · 2:10 — the comment box
     t0: 130, t1: 135, pal: 'NIGHTV', cam: camFor({ x: -0.2, z: 31, size: 0.12, feet: 0.86 }),
+    move: { push: 0.08, side: 0.3 },
     focus: 0.60, blur: 4, light: { x: -0.4, z: 17, r: 7 },
     comment: { in: 130.4, out: 134.9 },
     draw(t, pal) { setVillage(t, pal, { light: 0.3, man: false }); },
   },
   { // 20 · 2:15 — the lintel
-    t0: 135, t1: 140, pal: 'CREAM', cam: {}, focus: 0.5, blur: 4, light: { x: 0, z: 20, r: 10 }, bloom: 0.12,
+    t0: 135, t1: 140, pal: 'CREAM', cam: {}, move: { push: 0.05 },
+    focus: 0.5, blur: 4, light: { x: 0, z: 20, r: 10 }, bloom: 0.12,
     draw(t, pal) {
       g.fillStyle = '#f4ead6'; g.fillRect(0, 0, ART_W, ART_H);
       for (let i = 0; i < 260; i++) {
@@ -1552,10 +1759,20 @@ function shotAt(t) {
 function renderFrame(t) {
   const shot = shotAt(t);
   const pal = palAt(t);
-  // the set never moves; the camera drifts through the shot
+  // the set never moves; the camera does. Each shot gets its own move: a
+  // push (as a fraction of the distance to the subject), a truck, a crane.
+  T0 = shot.t0; T1 = shot.t1;
   const k = smooth(seg(t, shot.t0, shot.t1));
   const cam = camOf(shot.cam);
-  CAM = { ...cam, z: cam.z + k * 0.55, y: cam.y - k * 0.16 };
+  const mv = shot.move || {};
+  const dz0 = cam.dz ?? 14;
+  const push = (mv.push ?? 0.10) * dz0 * k;
+  CAM = {
+    ...cam,
+    z: cam.z + push,
+    x: cam.x + (mv.side ?? 0) * (k - 0.5) + 0.022 * Math.sin(t * 0.9),
+    y: cam.y + (mv.rise ?? 0) * k + 0.014 * Math.sin(t * 1.27 + 1.1),
+  };
   LIGHT_SRC = shot.light;
 
   g.setTransform(1, 0, 0, 1, 0, 0);
@@ -1592,6 +1809,24 @@ const tc = sec => {
   return `${pad(h)}:${pad(m)}:${pad(s2)},${pad(r, 3)}`;
 };
 initSprites();
+// sprite lab: SPRITES=man,angel node render.mjs -> /tmp/sprites.png
+if (process.env.SPRITES) {
+  const names = process.env.SPRITES.split(',');
+  const modes = ['idle', 'walk', 'gesture', 'reach', 'kneel'];
+  const S = 5, W = 46 * S, H = 58 * S;
+  const sheet = createCanvas((W + 2) * CYCLE + 8, (H + 2) * names.length * modes.length + 8);
+  const sx = sheet.getContext('2d');
+  sx.fillStyle = '#141018'; sx.fillRect(0, 0, sheet.width, sheet.height);
+  sx.imageSmoothingEnabled = false;
+  let r = 0;
+  for (const nm of names) for (const md of modes) {
+    for (let i = 0; i < CYCLE; i++) sx.drawImage(personFrame(nm, md, i / CYCLE), i * (W + 2) + 4, r * (H + 2) + 4, W, H);
+    r++;
+  }
+  fs.writeFileSync('/tmp/sprites.png', sheet.toBuffer('image/png'));
+  console.log('/tmp/sprites.png', sheet.width, sheet.height);
+  process.exit(0);
+}
 const SRT_FILE = 'films/never-heard/never-heard.srt';
 fs.writeFileSync(SRT_FILE, SUBS.map((s2, i) =>
   `${i + 1}\n${tc(s2.in)} --> ${tc(s2.out)}\n${s2.text.replace(/\*/g, '')}\n`).join('\n'));

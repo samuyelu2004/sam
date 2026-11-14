@@ -16,10 +16,31 @@ Captions: [`never-heard.srt`](never-heard.srt)
 ## Look
 
 The 2.5D pixel diorama: everything is painted in code on a 360×640 art canvas
-(2× upscale) — isometric boxes for architecture, flat sprites for people — then
+(2× upscale) — isometric boxes for architecture, rigged sprites for people — then
 lit, fogged, tilt-shifted, bloomed and vignetted into a lit tabletop model.
 A raking beam crosses every floor, dust drifts through it, and the camera drifts
 through each shot rather than the set moving.
+
+## Animation
+
+The set is built once; everything that moves is animated on the frame clock.
+
+- **Figures are a small rig**, not a single drawing: `personSprite(cfg, mode, ph)`
+  paints legs, a tapered tunic, two arms that swing from the shoulder and bend at
+  the elbow, and a head that bobs. Eight frames per cycle, per pose (`idle`,
+  `walk`, `gesture`, `reach`, `point`, `kneel`), cached on first use.
+- **Walks are driven by distance, not time** — `track()` lerps a person along a
+  line between marks and advances the walk phase with the metres covered, so the
+  feet land where the body does and never skate.
+- **Blocking is on a path**: the man walks out of the dark to the door and knocks,
+  the Roman crosses the street and then points, Paul walks in across the agora,
+  Peter and Cornelius meet, the two groups come up to the cross, the traveller
+  climbs the road toward the lens, and the lamp is passed from hand to hand.
+- **The camera carries the shot**: every shot declares `move: { push, side, rise }`
+  — a push as a fraction of the distance to the subject, a truck, a crane — plus a
+  breath of hand-held float. Pushes run 5–16 % so the frame is always closing in.
+- **The world breathes**: doorway lamps and lanterns flicker (`flick()`), motes
+  and sparks drift, and the scales in shot 12 swing on their beam.
 
 Type is DejaVu Serif (italic) in cream over a dark plate: the voice-over sits
 top-left, badges are pills at the foot of the frame, scripture arrives on cream
@@ -67,6 +88,7 @@ Stills, for checking the look without a full render:
 
 ```bash
 STILLS="3.5,45,96" node films/never-heard/render.mjs   # -> /tmp/still-<t>.png
+SPRITES=man,angel node films/never-heard/render.mjs    # -> /tmp/sprites.png, every pose x 8
 ```
 
 `render.mjs` writes `never-heard.srt` from the same narration list that drives
