@@ -1,0 +1,227 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #09080c;
+      font-family: 'EB Garamond', serif;
+    }
+    .stage-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .cam-plane {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      will-change: transform;
+    }
+    .scene-art {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: cover;
+      image-rendering: auto;
+    }
+    .god-rays {
+      position: absolute;
+      inset: -120px;
+      background:
+        repeating-linear-gradient(
+          118deg,
+          transparent 0px,
+          transparent 110px,
+          rgba(255, 214, 120, 0.24) 155px,
+          transparent 220px
+        );
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .mote {
+      position: absolute;
+      background: #ffe299;
+      box-shadow: 0 0 12px 3px rgba(255, 196, 80, 0.85);
+      border-radius: 1px;
+      pointer-events: none;
+    }
+    .hd2d-tiltshift {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(6, 5, 10, 0.68) 0%, rgba(6, 5, 10, 0.0) 17%, rgba(6, 5, 10, 0.0) 76%, rgba(6, 5, 10, 0.78) 100%),
+        radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 54%, rgba(5, 4, 9, 0.76) 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .hd2d-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.018) 0px,
+        rgba(255, 255, 255, 0.018) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 6;
+    }
+    .hd2d-frame {
+      position: absolute;
+      left: 96px;
+      right: 96px;
+      top: 54px;
+      bottom: 54px;
+      border: 1px solid rgba(218, 182, 108, 0.28);
+      box-shadow: inset 0 0 0 3px rgba(10, 8, 14, 0.45);
+      pointer-events: none;
+      z-index: 7;
+    }
+    .chapter-plaque {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 22px;
+      background: linear-gradient(180deg, rgba(16, 14, 22, 0.88) 0%, rgba(10, 9, 15, 0.92) 100%);
+      border: 1px solid rgba(226, 189, 112, 0.62);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 0 0 2px rgba(226, 189, 112, 0.16);
+    }
+    .chapter-act {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #f3d287;
+    }
+    .chapter-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: #d6ceb8;
+    }
+    .hd2d-hero-card {
+      text-align: center;
+      padding: 26px 44px;
+      background: linear-gradient(180deg, rgba(14, 12, 20, 0.86) 0%, rgba(9, 8, 14, 0.92) 100%);
+      border: 1px solid rgba(232, 195, 116, 0.75);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.75), inset 0 0 0 3px rgba(232, 195, 116, 0.18);
+    }
+    .hero-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.28em;
+      color: #d9b86c;
+      margin-bottom: 10px;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #fff8e7;
+    }
+    .hero-rule {
+      width: 180px;
+      height: 2px;
+      margin: 14px auto;
+      background: linear-gradient(90deg, transparent, #e5c16c, transparent);
+    }
+    .hero-sub {
+      font-family: 'EB Garamond', serif;
+      font-size: 26px;
+      font-style: italic;
+      color: #efe4ca;
+    }
+  </style>
+
+  <div id="root" data-composition-id="scene-08" data-width="1920" data-height="1080">
+    <div id="s08-stage-clip" class="clip stage-wrap" data-start="0" data-duration="22.1">
+      <div id="s08-fade-wrap" class="stage-wrap">
+        <div id="s08-cam" class="cam-plane">
+          <img id="s08-img" class="clip scene-art" src="assets/images/scene-08-the-weight.png" data-start="0" data-duration="22.1" alt="ACT VIII · THE WEIGHT IS OURS" />
+          <div id="s08-rays" class="god-rays"></div>
+        </div>
+        <div id="s08-mote-0" class="mote" style="left:213px; top:818px; width:7px; height:7px;"></div>
+        <div id="s08-mote-1" class="mote" style="left:315px; top:755px; width:7px; height:7px;"></div>
+        <div id="s08-mote-2" class="mote" style="left:463px; top:890px; width:5px; height:5px;"></div>
+        <div id="s08-mote-3" class="mote" style="left:665px; top:703px; width:6px; height:6px;"></div>
+        <div id="s08-mote-4" class="mote" style="left:787px; top:782px; width:8px; height:8px;"></div>
+        <div id="s08-mote-5" class="mote" style="left:934px; top:660px; width:7px; height:7px;"></div>
+        <div id="s08-mote-6" class="mote" style="left:1046px; top:814px; width:10px; height:10px;"></div>
+        <div id="s08-mote-7" class="mote" style="left:1189px; top:724px; width:5px; height:5px;"></div>
+        <div id="s08-mote-8" class="mote" style="left:1343px; top:789px; width:6px; height:6px;"></div>
+        <div id="s08-mote-9" class="mote" style="left:1494px; top:744px; width:9px; height:9px;"></div>
+        <div id="s08-mote-10" class="mote" style="left:1646px; top:875px; width:5px; height:5px;"></div>
+        <div id="s08-mote-11" class="mote" style="left:839px; top:460px; width:7px; height:7px;"></div>
+        <div id="s08-mote-12" class="mote" style="left:1113px; top:465px; width:6px; height:6px;"></div>
+        <div id="s08-mote-13" class="mote" style="left:589px; top:533px; width:7px; height:7px;"></div>
+        <div id="s08-tilt" class="hd2d-tiltshift"></div>
+        <div id="s08-scan" class="hd2d-scanlines"></div>
+        <div id="s08-border" class="hd2d-frame"></div>
+      </div>
+    </div>
+
+    <div id="s08-banner-clip" class="clip" data-start="1.2" data-duration="20.10" style="position:absolute; left:192px; top:96px; z-index:8;">
+      <div id="s08-banner" class="chapter-plaque">
+        <div class="chapter-act">ACT VIII · THE WEIGHT IS OURS</div>
+        <div class="chapter-ref">ROMANS 10:14-15</div>
+      </div>
+    </div>
+
+      <div id="s08-title-clip" class="clip" data-start="17.5" data-duration="3.2" style="position:absolute; left:192px; right:192px; top:128px; z-index:9; pointer-events:none;">
+        <div id="s08-title-card" class="hd2d-hero-card">
+          <div class="hero-kicker">ACT VIII · CONCLUSION</div>
+          <div class="hero-title">THE ANSWER IS US</div>
+          <div class="hero-rule"></div>
+          <div class="hero-sub">The village of no name &mdash; ROMANS 10:14-15</div>
+        </div>
+      </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s08-fade-wrap", { opacity: 0 }, { opacity: 1, duration: 0.65, ease: "power2.out" }, 0);
+    tl.to("#s08-fade-wrap", { opacity: 0, duration: 0.5, ease: "power2.in" }, 21.55);
+    tl.fromTo("#s08-cam", { scale: 1.03, x: -18, y: -8 }, { scale: 1.12, x: 16, y: 10, duration: 22.1, ease: "sine.inOut" }, 0);
+    tl.fromTo("#s08-rays", { x: -36, opacity: 0.55 }, { x: 42, opacity: 0.95, duration: 22.1, ease: "sine.inOut" }, 0);
+    tl.fromTo("#s08-banner", { opacity: 0, x: -18 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 1.2);
+    tl.to("#s08-banner", { opacity: 0, x: -10, duration: 0.35, ease: "power2.in" }, 21.30);
+    tl.fromTo("#s08-mote-0", { x: 0, y: 0, opacity: 0.18 }, { x: 16, y: -78, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-0", { x: 32, y: -156, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-1", { x: 0, y: 0, opacity: 0.18 }, { x: 17, y: -132, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-1", { x: 34, y: -264, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-2", { x: 0, y: 0, opacity: 0.18 }, { x: 3, y: -71, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-2", { x: 6, y: -142, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-3", { x: 0, y: 0, opacity: 0.18 }, { x: -24, y: -114, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-3", { x: -48, y: -228, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-4", { x: 0, y: 0, opacity: 0.18 }, { x: 6, y: -112, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-4", { x: 12, y: -224, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-5", { x: 0, y: 0, opacity: 0.18 }, { x: 32, y: -129, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-5", { x: 64, y: -258, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-6", { x: 0, y: 0, opacity: 0.18 }, { x: 12, y: -86, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-6", { x: 24, y: -172, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-7", { x: 0, y: 0, opacity: 0.18 }, { x: 6, y: -97, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-7", { x: 12, y: -194, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-8", { x: 0, y: 0, opacity: 0.18 }, { x: 4, y: -117, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-8", { x: 8, y: -234, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-9", { x: 0, y: 0, opacity: 0.18 }, { x: 5, y: -164, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-9", { x: 10, y: -328, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-10", { x: 0, y: 0, opacity: 0.18 }, { x: 29, y: -106, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-10", { x: 58, y: -212, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-11", { x: 0, y: 0, opacity: 0.18 }, { x: -10, y: -107, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-11", { x: -20, y: -214, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-12", { x: 0, y: 0, opacity: 0.18 }, { x: -22, y: -132, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-12", { x: -44, y: -264, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-mote-13", { x: 0, y: 0, opacity: 0.18 }, { x: -33, y: -142, opacity: 0.92, duration: 11.05, ease: "sine.inOut" }, 0);
+    tl.to("#s08-mote-13", { x: -66, y: -284, opacity: 0.22, duration: 11.00, ease: "sine.inOut" }, 11.05);
+    tl.fromTo("#s08-title-card", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 17.5);
+    tl.to("#s08-title-card", { opacity: 0, y: -8, duration: 0.55, ease: "power2.in" }, 20.7);
+    window.__timelines["scene-08"] = tl;
+  </script>
+</template>

@@ -1,32 +1,45 @@
-# SPEC — The Two Trees (HD-2D Sacred Film)
+# The Village of No Name — HD-2D HyperFrames Specification
 
-## Overview
-- **Title:** *The Two Trees — Why Didn't God Remove the Tree from Eden?*
-- **Format:** `1920×1080` Landscape · `30 fps` · `105.0s` (`1:45`)
-- **Framework:** [HeyGen HyperFrames](https://github.com/heygen-com/hyperframes) (`v0.9.41`)
-- **Visual Direction:** **HD-2D Diorama** (*Octopath Traveler* / *Triangle Strategy* inspired) — expressive 16-bit/32-bit pixel-art character sprites set inside layered 2.5D architectural & natural sanctuaries, volumetric golden/celestial god-rays, rising pixel-bokeh motes, miniature tilt-shift shallow depth of field, subtle scanline texture, and antique-gold JRPG filigree framing.
+**Question:** What happens to people who never heard of Jesus? If Jesus is the only way to the Father, what about a man born in a remote village who died without ever hearing his name?
 
-## Palette & Typography
-- **Obsidian Ground:** `#09080c`
-- **Plaque Surface:** `rgba(12, 10, 18, 0.90)`
-- **Antique Filigree Gold:** `#f3d287` / `#e5c16c`
-- **Warm Parchment Ink:** `#fcf6e8`
-- **Display & Story Serif:** `Playfair Display` (700), `EB Garamond` (400, 500, 700)
-- **Scripture & Chapter Metadata:** `JetBrains Mono` (400, 700)
+**Style:** HD-2D HyperFrames — pixel-art / 2.5D layered sprite dioramas with tilt-shift depth-of-field, volumetric god-rays, bokeh motes, scanlines, JRPG filigree framing, rich vignette.
 
-## Seven-Act Timeline (`0.0s – 105.0s`)
+**Duration:** 2:51 (171 seconds) · 1920×1080 · 30fps · H.264 High + AAC stereo
 
-| Act | Composition | Window | VO Start | Scripture | Narrative Beat |
-| --- | --- | --- | --- | --- | --- |
-| **I** | `compositions/scene-01.html` | `0.0s – 16.0s` | `0.90s` | Genesis 2:9 | Eden's luminous sanctuary & the central question: if God foreknew the Fall, why leave the tree? |
-| **II** | `compositions/scene-02.html` | `16.0s – 32.6s` | `16.45s` | Deuteronomy 30:19 | The clockwork conservatory: a world with no ability to say *no* turns obedience into mere programming, not love. |
-| **III** | `compositions/scene-03.html` | `32.6s – 46.8s` | `33.05s` | Genesis 3:6 | The tree was planted for real freedom, yet humanity's choice fractured the garden in sorrow. |
-| **IV** | `compositions/scene-04.html` | `46.8s – 62.1s` | `47.25s` | 1 Peter 1:20 | Before creation's dust was shaped, Jesus — the Lamb slain before the foundation of the world — chose to bear the cost. |
-| **V** | `compositions/scene-05.html` | `62.1s – 76.6s` | `62.55s` | 1 Peter 2:24 · Gal 3:13 | From the first tree in Eden to the second tree on Calvary: God steps into history and climbs the Cross. |
-| **VI** | `compositions/scene-06.html` | `76.6s – 93.6s` | `77.05s` | John 19:41 · Luke 24:6 | The Great Exchange and the empty garden tomb at dawn on the third morning. |
-| **VII** | `compositions/scene-07.html` | `93.6s – 105.0s` | `94.05s` | Revelation 22:2 | Epilogue by the restored Tree of Life: free to love, redeemed forever. |
+**Voice:** voice-01 (narration), mastered to -16 LUFS
+**Score:** Karplus-Strong harp arpeggios + chamber string pads, 171s, -18 LUFS
+
+## 8-Act Timeline
+
+| # | Scene | Time | VO | Act Plaque | Scripture |
+|---|-------|------|-----|-----------|-----------|
+| 1 | THE QUESTION | 0.0–17.3s | @ 0.40s | ACT I · THE VILLAGE OF NO NAME | Romans 10:14 |
+| 2 | CORNELIUS IN CAESAREA | 17.3–33.0s | @ 17.70s | ACT II · A GENTILE WHO FEARED GOD | Acts 10:1-2 |
+| 3 | THE VISITOR | 33.0–56.9s | @ 33.40s | ACT III · THE VISITOR | Acts 10:3-8 |
+| 4 | NOT A RESPECTER OF PERSONS | 56.9–80.1s | @ 57.30s | ACT IV · NOT A RESPECTER OF PERSONS | Acts 10:34-35 |
+| 5 | NO ONE WITHOUT LIGHT | 80.1–107.7s | @ 80.50s | ACT V · NO ONE WITHOUT LIGHT | Romans 1:20 · Acts 17:23 |
+| 6 | JUDGED BY THE LIGHT GIVEN | 107.7–127.7s | @ 108.10s | ACT VI · JUDGED BY THE LIGHT GIVEN | Luke 12:48 · Genesis 18:25 |
+| 7 | NO OTHER NAME | 127.7–148.9s | @ 128.10s | ACT VII · NO OTHER NAME | Acts 4:12 |
+| 8 | THE WEIGHT IS OURS | 148.9–171.0s | @ 149.30s | ACT VIII · THE WEIGHT IS OURS | Romans 10:14-15 |
+
+- Intro title card: scene-01, 0.15–4.75s
+- Epilogue card ("THE ANSWER IS US"): scene-08, 17.5–20.7s local
+- 37 synchronized dialogue captions
+
+## Visual System (per scene)
+- Full-frame 1920×1080 HD-2D diorama image with slow camera drift (scale 1.03→1.12)
+- Volumetric god-rays layer (screen blend, drift animation)
+- 14 bokeh motes with two-phase float animation
+- Tilt-shift depth-of-field + vignette, subtle scanlines
+- JRPG filigree frame + chapter plaque (ACT title + scripture ref)
 
 ## Sound Architecture
-- **Voiceover (`vo-01` .. `vo-07`):** 7 spoken narration stems (`assets/audio/vo-scene-01.mp3` – `vo-scene-07.mp3`), loudness-normalized to `-16 LUFS` / `-1.5 dBTP`.
-- **Chamber Score (`bgm-score`):** `assets/audio/hd2d-score.mp3` — Karplus-Strong acoustic harp arpeggios and warm cathedral string pads shifting key across all 7 acts, mixed at `data-volume="0.14"` beneath the narrator with `1.5s` fade-in and `3.0s` fade-out.
-- **Captions (`compositions/captions.html`):** 26 waveform-aligned HD-2D dialogue plaques inside the 80% title-safe zone.
+- 8 narration clips (`assets/audio/vo-scene-01..08.mp3`), -16 LUFS, placed at scene start + 0.40s
+- Score `assets/audio/hd2d-score.mp3` at 0.14 volume with 1.5s fade-in / 3.0s fade-out
+
+## CLI Commands
+```bash
+PATH="/home/user/.local/bin:$PATH" npx hyperframes lint
+PATH="/home/user/.local/bin:$PATH" npx hyperframes timeline --json
+PATH="/home/user/.local/bin:$PATH" npx hyperframes render --output renders/village-of-no-name-hd2d.mp4
+```
